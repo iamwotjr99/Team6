@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import './globals.css';
+import '../styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang='ko'>
       <body
-        className={'h-dvh w-screen content-center bg-[#ECECEC] font-pretendard'}
+        className={'h-dvh w-screen content-center bg-[#ECECEC]'}
       >
         <main className='relative mx-auto flex h-full max-h-dvh w-full min-w-[360px] max-w-[430px] flex-col bg-white'>
           {children}
