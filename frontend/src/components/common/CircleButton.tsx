@@ -21,7 +21,7 @@ export default function CircleButton({
   return (
     <button
       className={twMerge(
-        'flex shrink-0 items-center justify-center rounded-full bg-brand',
+        'flex shrink-0 items-center justify-center text-white rounded-full bg-green-700',
         className,
         getCircleButtonSizeStyle(size),
       )}
