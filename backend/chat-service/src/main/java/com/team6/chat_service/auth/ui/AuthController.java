@@ -8,6 +8,7 @@ import com.team6.chat_service.auth.application.dto.LoginResponse;
 import com.team6.chat_service.auth.application.dto.SignupRequestDto;
 import com.team6.chat_service.auth.application.dto.TokenResponse;
 import com.team6.chat_service.auth.application.dto.internal.RefreshTokenWithTTL;
+import com.team6.chat_service.auth.infrastructure.security.CustomUserDetails;
 import com.team6.chat_service.global.common.ApiResponse;
 import com.team6.chat_service.global.common.ResponseFactory;
 import com.team6.chat_service.global.util.CookieUtil;
@@ -70,9 +71,11 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal Long userId, HttpServletResponse response) {
-        authService.logout(userId, response);
+    public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
+        authService.logout(customUserDetails.id(), response);
 
         return ResponseFactory.ok("로그아웃 성공", null);
     }
 }
+
+

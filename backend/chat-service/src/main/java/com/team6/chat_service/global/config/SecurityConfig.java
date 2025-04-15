@@ -1,6 +1,7 @@
 package com.team6.chat_service.global.config;
 
 import com.team6.chat_service.auth.infrastructure.jwt.JwtAuthenticationFilter;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +42,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/login",
+                                "/api/auth/signup",
+                                "/api/auth/refresh",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/users/nickname/check"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
