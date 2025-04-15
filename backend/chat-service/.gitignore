@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+## mysql
+/backend/chat-service/mysql-data/
+
+## redis
+/backend/chat-service/redis-data/
