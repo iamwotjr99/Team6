@@ -9,4 +9,8 @@ public interface UserRepository {
     Optional<User> findByKakaoEmail(String kakaoEmail);
 
     Optional<User> findById(Long id);
+
+    boolean existsByNickname(String nickname);
+
+    void deleteByUserId(Long userId);
 }

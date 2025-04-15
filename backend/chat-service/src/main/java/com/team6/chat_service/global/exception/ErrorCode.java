@@ -13,6 +13,7 @@ public enum ErrorCode {
 
     // 유저 관련
     NICKNAME_TOO_SHORT(400, "닉네임은 2자 이상이어야 합니다."),
+    DUPLICATE_NICKNAME(409, "이미 존재하는 닉네임입니다."),
     USER_NOT_FOUND(404, "존재하지 않는 사용자입니다."),
     DUPLICATE_USER(409, "이미 가입된 사용자입니다."),
 

@@ -1,5 +1,6 @@
 package com.team6.chat_service.auth.infrastructure.jwt;
 
+import com.team6.chat_service.auth.infrastructure.security.CustomUserDetails;
 import com.team6.chat_service.auth.infrastructure.security.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -34,9 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && jwtProvider.validateToken(token)) {
                 Long userId = jwtProvider.getUserIdFromToken(token);
 
-                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+                CustomUserDetails customUserDetails = customUserDetailsService.loadUserById(userId);
 
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

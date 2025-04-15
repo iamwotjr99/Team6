@@ -13,7 +13,7 @@ public class CustomUserDetailsService {
 
     private final UserRepository userRepository;
 
-    public UserDetails loadUserById(Long id) {
+    public CustomUserDetails loadUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("해당 유저을 찾을 수 없습니다: " + id));
 

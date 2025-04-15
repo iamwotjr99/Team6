@@ -1,6 +1,7 @@
 package com.team6.chat_service.user.infrastructure;
 
 import com.team6.chat_service.user.domain.User;
+import com.team6.chat_service.user.domain.entity.NicknameEntity;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.domain.repository.UserRepository;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
@@ -32,4 +33,15 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaUserRepository.findById(id)
                 .map(UserEntity::toUser);
     }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return jpaUserRepository.existsByNickname(new NicknameEntity(nickname));
+    }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        jpaUserRepository.deleteById(userId);
+    }
+
 }
