@@ -1,0 +1,30 @@
+# 공통 무시 파일
+.DS_Store
+*.log
+*.tmp
+*.pid
+*.sock
+
+# 환경 변수
+.env*
+.env.local
+
+# Docker 볼륨 데이터
+backend/chat-service/mysql-data/
+backend/chat-service/redis-data/
+
+# IDE & 빌드 설정
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Java 빌드
+**/build/
+**/target/
+
+# Node.js 빌드
+node_modules/
+frontend/build/
+frontend/dist/
