@@ -33,13 +33,13 @@ const RIGHT_MENUS = [
   }
 ];
 
-
 export default function Navbar() {
   const setModal = useModalStore.use.setModal();
 
   const handleChatModal = () => {
-    setModal(<ChatCreateModal />); //
+    setModal(<ChatCreateModal />); 
   };
+  
   return (
     <nav
       className="fixed bottom-0 left-1/2 z-40 flex h-16 w-full max-w-[430px] -translate-x-1/2 items-center justify-around border-t rounded-t-2xl bg-white">
