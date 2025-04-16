@@ -1,11 +1,14 @@
 package com.team6.chat_service.global.config;
 
 import com.team6.chat_service.auth.infrastructure.jwt.JwtAuthenticationFilter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,9 +26,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOriginPattern("*");
-        config.addAllowedMethod("*");
-        config.addAllowedHeader("*");
+
+        // 명시적으로 origin 나열
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5500",
+                "http://127.0.0.1:5500"
+        ));
+
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -36,6 +46,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
@@ -47,7 +58,8 @@ public class SecurityConfig {
                                 "/api/auth/refresh",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api/users/nickname/check"
+                                "/api/users/nickname/check",
+                                "/ws-stomp/**" // websocket 테스트
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

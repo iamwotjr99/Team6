@@ -26,3 +26,9 @@ jwt:
   secret: 45eeHf/MQY5Fh6nkeDIR10OFtlgd3mwPIzxFhvpaLvsiPJFtBq+t/Sc0icBsHKDnRKZJysgXO0b7RRV1urz7Iw==
   access-token-expiration: 3600000
   refresh-token-expiration: 1209600000
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.messaging: DEBUG
+    org.springframework.web.socket: DEBUG
