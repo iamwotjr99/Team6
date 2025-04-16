@@ -12,6 +12,7 @@
 # Docker 볼륨 데이터
 backend/chat-service/mysql-data/
 backend/chat-service/redis-data/
+backend/chat-service/src/main/resources/application.yml
 
 # IDE & 빌드 설정
 .idea/
