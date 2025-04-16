@@ -15,6 +15,11 @@ services:
       --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:latest
@@ -23,3 +28,16 @@ services:
       - "6379:6379"
     volumes:
       - ./redis-data:/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: DockerFile
+    container_name: chat-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started

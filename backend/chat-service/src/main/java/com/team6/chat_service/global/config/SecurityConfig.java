@@ -30,7 +30,8 @@ public class SecurityConfig {
         // 명시적으로 origin 나열
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5500",
-                "http://127.0.0.1:5500"
+                "http://127.0.0.1:5500",
+                "http://localhost:3000"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
