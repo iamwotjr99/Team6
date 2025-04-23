@@ -31,7 +31,9 @@ public class SecurityConfig {
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "http://3.38.153.246:8080",
+                "http://localhost:8080"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -60,6 +62,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/api/users/nickname/check",
+                                "/api/auth/oauth/**",
                                 "/ws-stomp/**" // websocket 테스트
                         ).permitAll()
                         .anyRequest().authenticated()
