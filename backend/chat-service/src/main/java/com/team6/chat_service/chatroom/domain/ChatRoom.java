@@ -1,7 +1,6 @@
 package com.team6.chat_service.chatroom.domain;
 
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +18,7 @@ public class ChatRoom {
     private LocalDateTime lastMessageAt;
     private LocalDateTime createdAt;
 
-    public static ChatRoom createChatRoom(Long userId, ChatRoomTitle title) {
+    public static ChatRoom create(Long userId, ChatRoomTitle title) {
         return new ChatRoom(null, userId, title);
     }
 
