@@ -21,6 +21,8 @@ public enum ErrorCode {
     CHATROOM_TITLE_ESSENTIAL(400, "채팅방 제목은 필수입니다."),
     CHATROOM_TITLE_TOO_SHORT(400, "채팅방 제목은 2자 이상이어야 합니다."),
     CHATROOM_TITLE_TOO_LONG(400, "채팅방 제목은 20자 이하여야 합니다."),
+    NO_CREATE_ANY_CHATROOM(409, "생성한 채팅방이 존재하지 않습니다."),
+    CHATROOM_NOT_FOUND(404, "존재하지 않는 채팅방입니다."),
 
     // 서버, 기타
     BAD_REQUEST(400, "잘못된 요청입니다."),
