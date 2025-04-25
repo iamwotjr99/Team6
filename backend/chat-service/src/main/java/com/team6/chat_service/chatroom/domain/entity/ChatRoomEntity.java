@@ -2,7 +2,6 @@ package com.team6.chat_service.chatroom.domain.entity;
 
 import com.team6.chat_service.chatroom.domain.ChatRoom;
 import com.team6.chat_service.chatroom.domain.ChatRoomTitle;
-import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -38,7 +37,7 @@ public class ChatRoomEntity {
     private UserEntity creator;
 
     @Embedded
-    ChatRoomTitleEntity titleEntity;
+    private ChatRoomTitleEntity titleEntity;
 
     @Column(name = "last_message")
     private String lastMessage;

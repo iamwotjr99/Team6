@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>채팅 테스트</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+
+<h1>채팅방 테스트</h1>
+
+<div>
+  <input type="text" id="messageInput" placeholder="메시지를 입력하세요" />
+  <button onclick="sendMessage()">전송</button>
+</div>
+
+<ul id="messages"></ul>
+
+<script>
+  let stompClient = null;
+
+  function connect() {
+    const socket = new SockJS('http://localhost:8080/ws-stomp'); // 🔥 여기 서버 주소 맞춰야 해
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+      console.log('🟢 연결 성공:', frame);
+
+      // 채팅방 1번 구독
+      stompClient.subscribe('/sub/chatroom/1', function (message) {
+        const msg = JSON.parse(message.body);
+        console.log('📩 받은 메시지:', msg);
+        showMessage(msg);
+      });
+    });
+  }
+
+  function sendMessage() {
+    const messageContent = document.getElementById('messageInput').value;
+    if (messageContent && stompClient) {
+      stompClient.send('/pub/chatroom/1', {}, JSON.stringify({
+        senderId: 1,         // 🔥 임시 senderId
+        senderName: "jaesuk", // 🔥 임시 senderName
+        content: messageContent,
+        type: "TEXT"
+      }));
+      document.getElementById('messageInput').value = '';
+    }
+  }
+
+  function showMessage(message) {
+    const messages = document.getElementById('messages');
+    const messageElement = document.createElement('li');
+    messageElement.innerHTML = `<strong>${message.senderName}:</strong> ${message.content} <br><small>${message.createdAt}</small>`;
+    messages.appendChild(messageElement);
+  }
+
+  // 페이지 로딩 시 바로 연결
+  window.onload = connect;
+</script>
+
+</body>
+</html>

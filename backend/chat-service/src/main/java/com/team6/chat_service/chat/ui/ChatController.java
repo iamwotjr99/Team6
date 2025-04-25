@@ -1,6 +1,9 @@
 package com.team6.chat_service.chat.ui;
 
-import com.team6.chat_service.chat.dto.ChatMessage;
+import com.team6.chat_service.chat.domain.ChatMessage;
+import com.team6.chat_service.chat.domain.ChatMessageType;
+import com.team6.chat_service.chat.dto.ChatMessageResponse;
+import com.team6.chat_service.chat.dto.ChatMessageSendRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -17,9 +20,18 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chatroom/{roomId}")
-    public void sendMessage(@DestinationVariable String roomId, @Payload ChatMessage message) {
+    public void sendMessage(@DestinationVariable Long roomId, @Payload ChatMessageSendRequest message) {
         log.info("Sending message: {}", message);
-        messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, message);
+        ChatMessage chatMessage = ChatMessage.createChatMessage(
+                message.senderId(),
+                roomId,
+                message.senderName(),
+                message.content(),
+                ChatMessageType.from(message.type())
+        );
+
+        ChatMessageResponse response = ChatMessageResponse.from(chatMessage);
+        messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, response);
     }
 
 }
