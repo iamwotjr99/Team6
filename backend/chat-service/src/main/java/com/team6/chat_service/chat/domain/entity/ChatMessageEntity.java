@@ -1,5 +1,6 @@
 package com.team6.chat_service.chat.domain.entity;
 
+import com.team6.chat_service.chat.domain.ChatEventType;
 import com.team6.chat_service.chat.domain.ChatMessage;
 import com.team6.chat_service.chat.domain.ChatMessageType;
 import com.team6.chat_service.chatroom.domain.entity.ChatRoomEntity;
@@ -49,8 +50,12 @@ public class ChatMessageEntity {
     private String content;
 
     @Convert(converter = ChatMessageTypeConverter.class)
-    @Column(name = "type")
-    private ChatMessageType type;
+    @Column(name = "message_type")
+    private ChatMessageType messageType;
+
+    @Convert(converter = ChatEventTypeConverter.class)
+    @Column(name = "event_type")
+    private ChatEventType eventType;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -62,7 +67,8 @@ public class ChatMessageEntity {
         this.chatRoomEntity = chatRoomEntity;
         this.senderName = chatMessage.getSenderName();
         this.content = chatMessage.getContent();
-        this.type = chatMessage.getType();
+        this.messageType = chatMessage.getMessageType();
+        this.eventType = chatMessage.getEventType();
         this.createdAt = chatMessage.getCreatedAt();
     }
 
@@ -73,7 +79,8 @@ public class ChatMessageEntity {
                 .roomId(this.chatRoomEntity.getId())
                 .senderName(this.senderName)
                 .content(this.content)
-                .type(this.type)
+                .messageType(this.messageType)
+                .eventType(this.eventType)
                 .createdAt(this.createdAt)
                 .build();
     }

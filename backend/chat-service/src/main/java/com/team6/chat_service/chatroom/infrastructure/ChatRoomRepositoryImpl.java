@@ -4,9 +4,12 @@ import com.team6.chat_service.chatroom.domain.ChatRoom;
 import com.team6.chat_service.chatroom.domain.entity.ChatRoomEntity;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomRepository;
 import com.team6.chat_service.chatroom.infrastructure.jpa.JpaChatRoomRepository;
+import com.team6.chat_service.global.exception.CustomException;
+import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -23,6 +26,12 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
         ChatRoomEntity chatRoomEntity = new ChatRoomEntity(chatRoom, creatorEntity);
         ChatRoomEntity result = jpaChatRoomRepository.save(chatRoomEntity);
         return result.toChatRoom();
+    }
+
+    @Override
+    public Optional<ChatRoom> findById(Long roomId) {
+        return jpaChatRoomRepository.findById(roomId)
+                .map(ChatRoomEntity::toChatRoom);
     }
 
     @Override

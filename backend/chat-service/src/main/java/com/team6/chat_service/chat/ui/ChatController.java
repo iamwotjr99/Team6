@@ -1,9 +1,10 @@
 package com.team6.chat_service.chat.ui;
 
+import com.team6.chat_service.chat.application.ChatMessageService;
 import com.team6.chat_service.chat.domain.ChatMessage;
-import com.team6.chat_service.chat.domain.ChatMessageType;
-import com.team6.chat_service.chat.dto.ChatMessageResponse;
-import com.team6.chat_service.chat.dto.ChatMessageSendRequest;
+import com.team6.chat_service.chat.ui.dto.ChatMessageResponse;
+import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,19 +19,34 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final ChatMessageService chatMessageService;
 
     @MessageMapping("/chatroom/{roomId}")
     public void sendMessage(@DestinationVariable Long roomId, @Payload ChatMessageSendRequest message) {
         log.info("Sending message: {}", message);
-        ChatMessage chatMessage = ChatMessage.createChatMessage(
-                message.senderId(),
-                roomId,
-                message.senderName(),
-                message.content(),
-                ChatMessageType.from(message.type())
-        );
 
-        ChatMessageResponse response = ChatMessageResponse.from(chatMessage);
+        if (message.eventType().equals("ENTER")) {
+            sendPreviousMessages(roomId);
+        } else {
+            sendNewMessage(roomId, message);
+        }
+    }
+
+    private void sendPreviousMessages(Long roomId) {
+        List<ChatMessage> messages = chatMessageService.getChatMessageInRoom(roomId);
+
+        List<ChatMessageResponse> response = messages.stream()
+                .map(ChatMessageResponse::from)
+                .toList();
+
+        messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, response);
+    }
+
+    private void sendNewMessage(Long roomId, ChatMessageSendRequest message) {
+        ChatMessage savedMessage = chatMessageService.createChatMessage(roomId, message);
+
+        ChatMessageResponse response = ChatMessageResponse.from(savedMessage);
+
         messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, response);
     }
 

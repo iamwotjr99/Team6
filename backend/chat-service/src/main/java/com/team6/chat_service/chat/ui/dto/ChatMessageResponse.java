@@ -1,4 +1,4 @@
-package com.team6.chat_service.chat.dto;
+package com.team6.chat_service.chat.ui.dto;
 
 import com.team6.chat_service.chat.domain.ChatMessage;
 import lombok.Builder;
@@ -8,7 +8,8 @@ public record ChatMessageResponse(
         Long senderId,
         String senderName,
         String content,
-        String type,
+        String messageType,
+        String eventType,
         String createdAt
 ) {
     public static ChatMessageResponse from(ChatMessage chatMessage) {
@@ -16,7 +17,8 @@ public record ChatMessageResponse(
                 .senderId(chatMessage.getSenderId())
                 .senderName(chatMessage.getSenderName())
                 .content(chatMessage.getContent())
-                .type(chatMessage.getType().name())
+                .messageType(chatMessage.getMessageType().name())
+                .eventType(chatMessage.getEventType().name())
                 .createdAt(chatMessage.getCreatedAt().toString())
                 .build();
     }
