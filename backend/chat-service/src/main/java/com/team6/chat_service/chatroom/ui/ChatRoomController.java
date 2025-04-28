@@ -40,7 +40,7 @@ public class ChatRoomController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/{userId}")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getChatRooms(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {

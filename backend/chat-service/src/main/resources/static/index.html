@@ -19,31 +19,47 @@
 
 <script>
   let stompClient = null;
+  const roomId = 4;
 
   function connect() {
-    const socket = new SockJS('http://localhost:8080/ws-stomp'); // 🔥 여기 서버 주소 맞춰야 해
+    const socket = new SockJS('http://localhost:8080/ws-stomp');
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
-      console.log('🟢 연결 성공:', frame);
+      console.log('연결 성공:', frame);
 
       // 채팅방 1번 구독
-      stompClient.subscribe('/sub/chatroom/1', function (message) {
+      stompClient.subscribe(`/sub/chatroom/${roomId}`, function (message) {
         const msg = JSON.parse(message.body);
-        console.log('📩 받은 메시지:', msg);
-        showMessage(msg);
+        console.log('받은 메시지:', msg);
+
+        if(Array.isArray(msg)) {
+          msg.forEach(m => showMessage(m));
+        } else {
+          showMessage(msg);
+        }
       });
+
+      stompClient.send('/pub/chatroom/1', {}, JSON.stringify({
+        senderId: 2,
+        senderName: "jaesuk",
+        content: "",
+        messageType: "TEXT",
+        eventType: "ENTER"
+      }));
+
     });
   }
 
   function sendMessage() {
     const messageContent = document.getElementById('messageInput').value;
     if (messageContent && stompClient) {
-      stompClient.send('/pub/chatroom/1', {}, JSON.stringify({
-        senderId: 1,         // 🔥 임시 senderId
+      stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
+        senderId: 2,         // 🔥 임시 senderId
         senderName: "jaesuk", // 🔥 임시 senderName
         content: messageContent,
-        type: "TEXT"
+        messageType: "TEXT",
+        eventType: "NONE"
       }));
       document.getElementById('messageInput').value = '';
     }
