@@ -23,6 +23,13 @@ public class UserService {
         return new DuplicateNicknameCheckResponseDto(nickname, true);
     }
 
+    public User findById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return user;
+    }
+
     @Transactional
     public void deleteByUserId(Long userId) {
         userRepository.findById(userId)

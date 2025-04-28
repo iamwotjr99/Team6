@@ -13,6 +13,7 @@ import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -43,10 +44,8 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepository {
     }
 
     @Override
-    public List<ChatRoomUser> findChatRoomByUserId(Long userId) {
-        return jpaChatRoomUserRepository.findByUserEntity_Id(userId)
-                .stream()
-                .map(ChatRoomUserEntity::toChatRoomUser)
-                .collect(Collectors.toList());
+    public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
+        return jpaChatRoomUserRepository.existsByUserEntity_IdAndChatRoomEntity_Id(userId, roomId);
     }
+
 }

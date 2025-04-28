@@ -1,11 +1,13 @@
 package com.team6.chat_service.user.ui;
 
 import com.team6.chat_service.auth.application.AuthService;
+import com.team6.chat_service.auth.infrastructure.KakaoClient;
 import com.team6.chat_service.auth.infrastructure.security.CustomUserDetails;
 import com.team6.chat_service.global.common.ApiResponse;
 import com.team6.chat_service.global.common.ResponseFactory;
 import com.team6.chat_service.user.application.UserService;
 import com.team6.chat_service.user.application.dto.DuplicateNicknameCheckResponseDto;
+import com.team6.chat_service.user.domain.User;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
     private final AuthService authService;
+    private final KakaoClient kakaoClient;
 
     @GetMapping("/nickname/check")
     // /nickname/check?nickname=jaesuk
@@ -34,6 +37,10 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
+        User user = userService.findById(customUserDetails.id());
+
+        kakaoClient.unlinkUserByAdminKey(user.getKakaoId());
+
         userService.deleteByUserId(customUserDetails.id());
 
         authService.logout(customUserDetails.id(), response);

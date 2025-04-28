@@ -2,6 +2,7 @@ package com.team6.chat_service.user.domain.entity;
 
 import com.team6.chat_service.user.domain.Nickname;
 import com.team6.chat_service.user.domain.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -27,9 +28,13 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "kakao_id")
+    private Long kakaoId;
+
     @Embedded
     private NicknameEntity nickname;
 
+    @Column(name = "kakao_email")
     private String kakaoEmail;
 
     @CreatedDate
@@ -37,6 +42,7 @@ public class UserEntity {
 
     public UserEntity(User user) {
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.nickname = new NicknameEntity(user.getNicknameValue());
         this.kakaoEmail = user.getKakaoEmail();
         this.createdAt = user.getCreatedAt();
@@ -45,6 +51,7 @@ public class UserEntity {
     public User toUser() {
         return User.builder()
                 .id(this.id)
+                .kakaoId(this.kakaoId)
                 .nickname(new Nickname(this.nickname.getNickname()))
                 .kakaoEmail(this.kakaoEmail)
                 .createdAt(createdAt)

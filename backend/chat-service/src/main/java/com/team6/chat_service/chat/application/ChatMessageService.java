@@ -26,8 +26,10 @@ public class ChatMessageService {
     public ChatMessage createChatMessage(Long roomId, ChatMessageSendRequest dto) {
         ChatMessage chatMessage = ChatMessage.createChatMessage(dto.senderId(), roomId,
                 dto.senderName(), dto.content(), dto.messageType(), dto.eventType());
+
         User user = userRepository.findById(dto.senderId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
 

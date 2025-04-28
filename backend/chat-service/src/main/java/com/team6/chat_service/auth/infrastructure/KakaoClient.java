@@ -28,6 +28,9 @@ public class KakaoClient {
     @Value("${oauth.kakao.user-info-uri}")
     private String userInfoUri;
 
+    @Value("${oauth.kakao.admin-key}")
+    private String adminKey;
+
     private final WebClient webClient = WebClient.builder().build();
 
     // 프론트에서 받은 인가 코드로 카카오에게 엑세스 토큰 요청
@@ -54,6 +57,18 @@ public class KakaoClient {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToMono(KakaoUserResponse.class)
+                .block();
+    }
+
+    public void unlinkUserByAdminKey(Long kakaoUserId) {
+        webClient.post()
+                .uri("https://kapi.kakao.com/v1/user/unlink")
+                .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + adminKey)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("target_id_type", "user_id")
+                        .with("target_id", kakaoUserId.toString()))
+                .retrieve()
+                .bodyToMono(Void.class)
                 .block();
     }
 
