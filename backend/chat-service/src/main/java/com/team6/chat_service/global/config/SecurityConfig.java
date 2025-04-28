@@ -66,6 +66,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api/users/nickname/check",
                                 "/api/auth/oauth/**",
+                                "/api/chatmessage/**",
                                 "/ws-stomp/**" // websocket 테스트
                         ).permitAll()
                         .anyRequest().authenticated()

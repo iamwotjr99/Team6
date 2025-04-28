@@ -36,13 +36,14 @@ public class AuthService {
         KakaoUserResponse userInfo = kakaoClient.getUserInfo(token.accessToken());
 
         String email = userInfo.kakaoAccount().email();
+        Long kakoId = userInfo.id();
         boolean isRegistered = userRepository.findByKakaoEmail(email).isPresent();
 
-        return new KakaoAuthCheckResponse(isRegistered, email);
+        return new KakaoAuthCheckResponse(isRegistered, kakoId, email);
     }
 
-    public LoginResponse login(String kakaoEmail) {
-        User user = userRepository.findByKakaoEmail(kakaoEmail)
+    public LoginResponse login(String nickname) {
+        User user = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String accessToken = jwtProvider.createAccessToken(user.getId());
@@ -53,12 +54,12 @@ public class AuthService {
         );
     }
 
-    public LoginResponse signup(String nickname, String kakaoEamil) {
+    public LoginResponse signup(String nickname, Long kakaoId, String kakaoEamil) {
         if (userRepository.findByKakaoEmail(kakaoEamil).isPresent()) {
             throw new CustomException(ErrorCode.DUPLICATE_USER);
         }
 
-        User user = User.createUser(new Nickname(nickname), kakaoEamil);
+        User user = User.createUser(new Nickname(nickname), kakaoId, kakaoEamil);
         user = userRepository.save(user);
 
         String accessToken = jwtProvider.createAccessToken(user.getId());
@@ -92,8 +93,8 @@ public class AuthService {
         CookieUtil.deleteRefreshTokenInCookie(response);
     }
 
-    public RefreshTokenWithTTL issueRefreshToken(String kakaoEmail) {
-        User user = userRepository.findByKakaoEmail(kakaoEmail)
+    public RefreshTokenWithTTL issueRefreshToken(String nickname) {
+        User user = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String refreshToken = jwtProvider.createRefreshToken(user.getId());

@@ -29,6 +29,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByNickname(String nickname) {
+        return jpaUserRepository.findByNickname(new NicknameEntity(nickname))
+                .map(UserEntity::toUser);
+    }
+
+    @Override
     public Optional<User> findById(Long id) {
         return jpaUserRepository.findById(id)
                 .map(UserEntity::toUser);

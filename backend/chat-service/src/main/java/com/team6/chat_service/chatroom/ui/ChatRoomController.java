@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chatrooms")
+@RequestMapping("/api/chatroom")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
@@ -40,7 +40,7 @@ public class ChatRoomController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @GetMapping
+    @GetMapping("/my")
     public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getChatRooms(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {

@@ -1,5 +1,6 @@
 package com.team6.chat_service.chatroom.application;
 
+import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.application.dto.CreateChatRoomDto;
 import com.team6.chat_service.chatroom.domain.ChatRoom;
 import com.team6.chat_service.chatroom.domain.ChatRoomTitle;
@@ -12,6 +13,7 @@ import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,7 @@ public class ChatRoomService {
         return savedChatRoom;
     }
 
+    @Transactional
     public List<ChatRoom> getChatRooms(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -45,5 +48,21 @@ public class ChatRoomService {
         List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByIds(chatRoomIds);
 
         return chatRoomList;
+    }
+
+    @Transactional
+    public boolean enterChatRoom(Long userId, Long roomId) {
+        boolean alreadyEntered = chatRoomUserRepository.existsByUserIdAndRoomId(userId, roomId);
+
+        if(!alreadyEntered) {
+            ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            chatRoomUserRepository.save(chatRoom, user);
+        }
+
+        return alreadyEntered;
     }
 }

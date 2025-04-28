@@ -12,16 +12,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class User {
     private Long id;
+    private Long kakaoId;
     private Nickname nickname;
     private String kakaoEmail;
     private LocalDateTime createdAt;
 
-    public static User createUser(Nickname nickname, String kakaoEmail) {
-        return new User(null, nickname, kakaoEmail);
+    public static User createUser(Nickname nickname, Long kakaoId, String kakaoEmail) {
+        return new User(null, nickname, kakaoId, kakaoEmail);
     }
 
-    private User(Long id, Nickname nickname, String kakaoEmail) {
+    private User(Long id, Nickname nickname, Long kakaoId, String kakaoEmail) {
         this.id = id;
+        this.kakaoId = kakaoId;
         this.nickname = nickname;
         this.kakaoEmail = kakaoEmail;
         this.createdAt = LocalDateTime.now();

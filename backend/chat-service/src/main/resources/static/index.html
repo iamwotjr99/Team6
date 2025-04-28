@@ -10,53 +10,78 @@
 
 <h1>채팅방 테스트</h1>
 
+<!-- 채팅방 번호 입력창 -->
 <div>
+  <input type="text" id="roomIdInput" placeholder="채팅방 번호를 입력하세요" />
+  <button onclick="connect()">입장하기</button>
+</div>
+
+<!-- 메시지 입력창 -->
+<div style="margin-top: 20px;">
   <input type="text" id="messageInput" placeholder="메시지를 입력하세요" />
   <button onclick="sendMessage()">전송</button>
 </div>
 
-<ul id="messages"></ul>
+<ul id="messages" style="margin-top: 20px;"></ul>
 
 <script>
   let stompClient = null;
-  const roomId = 4;
+  let roomId = null;
 
   function connect() {
+    roomId = document.getElementById('roomIdInput').value;
+    if (!roomId) {
+      alert('채팅방 번호를 입력하세요.');
+      return;
+    }
+
+    if (stompClient !== null) {
+      stompClient.disconnect(() => {
+        console.log('기존 소켓 연결 끊음');
+      });
+    }
+
     const socket = new SockJS('http://localhost:8080/ws-stomp');
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function (frame) {
+      document.getElementById('messages').innerHTML = '';
+
       console.log('연결 성공:', frame);
 
-      // 채팅방 1번 구독
+      // 채팅방 구독
       stompClient.subscribe(`/sub/chatroom/${roomId}`, function (message) {
         const msg = JSON.parse(message.body);
         console.log('받은 메시지:', msg);
-
-        if(Array.isArray(msg)) {
-          msg.forEach(m => showMessage(m));
-        } else {
-          showMessage(msg);
-        }
+        showMessage(msg);
       });
 
-      stompClient.send('/pub/chatroom/1', {}, JSON.stringify({
-        senderId: 2,
-        senderName: "jaesuk",
+      // 채팅방 입장(ENTER) 메시지 보내기
+      stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
+        senderId: 4,          // 🔥 임시 senderId
+        senderName: "somin", // 🔥 임시 senderName
         content: "",
         messageType: "TEXT",
         eventType: "ENTER"
       }));
 
+      // 기존 채팅 기록 불러오기
+      fetch(`http://localhost:8080/api/chatmessage/${roomId}`)
+      .then(response => response.json())
+      .then(data => {
+        const chatList = data.data;
+        chatList.forEach(showMessage);
+      })
+      .catch(error => console.error('채팅 내역 불러오기 실패:', error));
     });
   }
 
   function sendMessage() {
     const messageContent = document.getElementById('messageInput').value;
-    if (messageContent && stompClient) {
+    if (messageContent && stompClient && roomId) {
       stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
-        senderId: 2,         // 🔥 임시 senderId
-        senderName: "jaesuk", // 🔥 임시 senderName
+        senderId: 4,          // 🔥 임시 senderId
+        senderName: "somin", // 🔥 임시 senderName
         content: messageContent,
         messageType: "TEXT",
         eventType: "NONE"
@@ -71,9 +96,6 @@
     messageElement.innerHTML = `<strong>${message.senderName}:</strong> ${message.content} <br><small>${message.createdAt}</small>`;
     messages.appendChild(messageElement);
   }
-
-  // 페이지 로딩 시 바로 연결
-  window.onload = connect;
 </script>
 
 </body>

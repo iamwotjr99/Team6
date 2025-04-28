@@ -41,9 +41,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequestDto loginRequestDto,
             HttpServletResponse response) {
-        LoginResponse result = authService.login(loginRequestDto.kakaoEmail());
+        LoginResponse result = authService.login(loginRequestDto.nickname());
 
-        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(loginRequestDto.kakaoEmail());
+        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(loginRequestDto.nickname());
         CookieUtil.setRefreshTokenInCookie(response, refreshTokenDto.token(), refreshTokenDto.refreshTokenExpiration());
 
         return ResponseFactory.ok("로그인 성공", result);
@@ -52,10 +52,10 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<LoginResponse>> signup(@RequestBody SignupRequestDto signupRequestDto,
             HttpServletResponse response) {
-        LoginResponse result = authService.signup(signupRequestDto.nickname(),
+        LoginResponse result = authService.signup(signupRequestDto.nickname(), signupRequestDto.kakaoId(),
                 signupRequestDto.kakaoEmail());
 
-        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(signupRequestDto.kakaoEmail());
+        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(signupRequestDto.nickname());
         CookieUtil.setRefreshTokenInCookie(response, refreshTokenDto.token(), refreshTokenDto.refreshTokenExpiration());
 
         return ResponseFactory.created("회원가입 성공", result);
