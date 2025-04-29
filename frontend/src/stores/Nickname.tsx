@@ -1,31 +1,41 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import createSelectors from '.';
 import { generateBaseNickname } from '@/utils/NicknameGenerator';
-// import { checkNickname } from '@/utils/checkNickname';
+import { checkNickname } from '@/utils/CheckNickname';
 
 type NicknameState = {
   nickname: string;
   setNickname: (nick: string) => void;
   generateNickname: () => Promise<string>;
+  checkNicknameOnly: () => Promise<boolean>;
+  clearNickname: () => void; 
 };
 
-const store = create<NicknameState>()((set) => ({
-  nickname: '',
-  setNickname: (nick) => set({ nickname: nick }),
+const store = create<NicknameState>()(
+  persist(
+    (set, get) => ({
+      nickname: '',
+      setNickname: (nick) => set({ nickname: nick }),
 
-  generateNickname: async () => {
-    let base = generateBaseNickname();
-    let candidate = base;
-    let suffix = 1;
+      generateNickname: async () => {
+        const nickname = generateBaseNickname();
+        set({ nickname });
+        return nickname;
+      },
 
-    // while (await checkNickname(candidate)) {
-    //   candidate = `${base}${suffix}`;
-    //   suffix++;
-    // }
+      checkNicknameOnly: async () => {
+        const currentNickname = get().nickname;
+        const isDuplicate = await checkNickname(currentNickname);
+        return isDuplicate;
+      },
 
-    set({ nickname: candidate });
-    return candidate;
-  },
-}));
+      clearNickname: () => set({ nickname: '' }),
+    }),
+    {
+      name: 'nickname-storage',
+    }
+  )
+);
 
 export const useNicknameStore = createSelectors(store);

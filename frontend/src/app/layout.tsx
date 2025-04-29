@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import '../styles/globals.css';
 import ModalProvider from '@/contexts/ModalContext';
+import { ThemeProvider } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -12,17 +14,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang='ko'>
-      <body
-        className={'h-dvh w-screen content-center bg-[#ECECEC]'}
-      >
-      <ModalProvider>
-        <main className='relative mx-auto flex h-full max-h-dvh w-full min-w-[360px] max-w-[430px] flex-col bg-white'>
-          {children}
-          <div id="modal"/>
-        </main>
-      </ModalProvider>
+      <body className={'h-dvh w-screen content-center bg-[#ECECEC]'}>
+        <ModalProvider>
+          <main className='relative mx-auto flex h-full max-h-dvh w-full min-w-[360px] max-w-[430px] flex-col bg-white'>
+            {children}
+            <div id='modal' />
+          </main>
+        </ModalProvider>
       </body>
     </html>
   );

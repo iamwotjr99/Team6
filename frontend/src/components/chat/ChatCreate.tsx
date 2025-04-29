@@ -12,7 +12,7 @@ export default function ChatCreate() {
   const [content, setContent] = useState('');
 
   const handleBack = () => {
-    router.back(); // 이전 페이지로 돌아감
+    router.back(); 
   };
 
   const onCreate = () => {

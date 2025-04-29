@@ -25,7 +25,7 @@ export default function ChatCreateModal() {
       </div>
       <div className="flex gap-4 font-bold w-60 items-center">
         <Button
-          className="border bg-white text-black h-12"
+          className="bg-white border text-black h-12"
           onClick={handleNewChat}
         >
           네

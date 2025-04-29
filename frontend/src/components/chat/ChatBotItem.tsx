@@ -18,7 +18,7 @@ export default function ChatBotItem() {
       <BackHeader mainText={'나만의 Ai 비서와 채팅'} onClick={handleBack}/>
       <div className='px-1 py-2'>
         <MeMessage message='한국에 대해 알려줘' time='2025-04-02'/>
-        <YouMessage message="한국은 동북아시아에 위치한 나라로.." time='2025-04-02' />
+        <YouMessage message="한국은 동북아시아에 위치한 나라로.." time='2025-04-02' nickname={''} />
       </div>
       <Inputbar />
     </section>
