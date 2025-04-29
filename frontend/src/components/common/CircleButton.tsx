@@ -43,4 +43,4 @@ function getCircleButtonSizeStyle(size: CircleButtonSize) {
     default:
       throw new Error(`Unsupported type size: ${size}`);
   }
-}
+} 

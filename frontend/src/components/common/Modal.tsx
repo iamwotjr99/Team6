@@ -15,7 +15,9 @@ export default function Modal({ children, onClose }: Props) {
       onClick={handleBgClick}
       className="absolute left-0 top-0 z-[9999] flex h-full w-full items-center justify-center bg-[#1A1A1A] bg-opacity-20"
     >
-      <div className="mx-4 w-full rounded-lg bg-white">{children}</div>
+      <div className="mx-4 w-full rounded-lg bg-white transition-colors duration-300">
+        {children}
+      </div>
     </section>
   );
 }

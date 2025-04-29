@@ -12,7 +12,7 @@ const Input = forwardRef(
       <input
         ref={ref}
         className={twMerge(
-          'h-11 w-full rounded-sm px-2 font-medium focus:outline-none',
+          'h-11 w-full rounded-sm px-2 font-medium focus:outline-none bg-white text-black transition-colors duration-300',
           className,
         )}
         {...rest}

@@ -1,4 +1,3 @@
-
 import { IoChatbubblesSharp } from 'react-icons/io5';
 import KakaoButton from '@/components/main/KaKaoButton';
 

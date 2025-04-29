@@ -28,7 +28,7 @@ const CheckBox = forwardRef(
             type="checkbox"
             id={uuid}
             className={twMerge(
-              'peer relative cursor-pointer appearance-none rounded-sm border border-light-gray bg-white transition-all checked:bg-brand',
+              'peer relative cursor-pointer appearance-none rounded-sm border border-light-gray bg-white transition-all',
               containerStyle,
               className,
             )}

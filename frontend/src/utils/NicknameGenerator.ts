@@ -25,8 +25,16 @@ const nouns = [
 
 // 닉네임 생성함수
 export function generateBaseNickname(): string {
-  const adj = adjs[Math.floor(Math.random() * adjs.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const randomN = Math.floor(1000 + Math.random() * 9000);
-  return `${adj}${noun}${randomN}`;
+
+  const totalCombos = adjs.length * nouns.length;
+  const r = Math.random() * (totalCombos * 9000);
+
+  const comboIndex = Math.floor(r / 9000);
+  const suffixRand = Math.floor(r % 9000);
+
+  const adjIndex = comboIndex % adjs.length;
+  const nounIndex = Math.floor(comboIndex / adjs.length);
+  const randomN = 1000 + suffixRand; 
+
+  return `${adjs[adjIndex]}${nouns[nounIndex]}${randomN}`;
 }
