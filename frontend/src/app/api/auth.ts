@@ -9,13 +9,11 @@ export async function loginWithKakao(kakaoEmail: string) {
     credentials: 'include',
     body: JSON.stringify({ kakaoEmail }),
   });
-
   if (!res.ok) {
     const errorText = await res.text();
     console.error('[loginWithKakao 실패]:', errorText);
     throw new Error('로그인 요청 실패');
   }
-
   const json = await res.json();
   return json.data; 
 }
@@ -58,10 +56,6 @@ export async function refreshAccessToken() {
 export async function logoutUser() {
   const accessToken = useAuthStore.getState().accessToken;
 
-  if (!accessToken) {
-    throw new Error('AccessToken이 없습니다.');
-  }
-
   const res = await fetch('http://3.38.153.246:8080/api/auth/logout', {
     method: 'POST',
     headers: {
@@ -89,7 +83,7 @@ export async function logoutUser() {
 
   window.location.href = '/'; 
 }
-export async function fetchMyInfo(kakaoEmail: string) {
+export async function fetchMyInfo() {
   const accessToken = useAuthStore.getState().accessToken;
 
   if (!accessToken) {
