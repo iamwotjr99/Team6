@@ -10,8 +10,15 @@
 
 <h1>채팅방 테스트</h1>
 
-<!-- 채팅방 번호 입력창 -->
+<!-- 유저 입력창 -->
 <div>
+  <input type="text" id="senderIdInput" placeholder="유저 ID 입력" />
+  <input type="text" id="senderNameInput" placeholder="유저 이름 입력" />
+</div>
+
+
+<!-- 채팅방 번호 입력창 -->
+<div style="margin-top: 20px;">
   <input type="text" id="roomIdInput" placeholder="채팅방 번호를 입력하세요" />
   <button onclick="connect()">입장하기</button>
 </div>
@@ -22,6 +29,11 @@
   <button onclick="sendMessage()">전송</button>
 </div>
 
+<!-- 퇴장 버튼 -->
+<div style="margin-top: 20px;">
+  <button onclick="leaveRoom()">퇴장하기</button>
+</div>
+
 <ul id="messages" style="margin-top: 20px;"></ul>
 
 <script>
@@ -29,9 +41,12 @@
   let roomId = null;
 
   function connect() {
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
     roomId = document.getElementById('roomIdInput').value;
-    if (!roomId) {
-      alert('채팅방 번호를 입력하세요.');
+
+    if (!roomId || !senderId || !senderName) {
+      alert('유저 ID, 유저 이름, 채팅방 번호를 모두 입력하세요.');
       return;
     }
 
@@ -58,8 +73,8 @@
 
       // 채팅방 입장(ENTER) 메시지 보내기
       stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
-        senderId: 4,          // 🔥 임시 senderId
-        senderName: "somin", // 🔥 임시 senderName
+        senderId: Number(senderId),          // 🔥 임시 senderId
+        senderName: senderName, // 🔥 임시 senderName
         content: "",
         messageType: "TEXT",
         eventType: "ENTER"
@@ -78,10 +93,13 @@
 
   function sendMessage() {
     const messageContent = document.getElementById('messageInput').value;
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
+
     if (messageContent && stompClient && roomId) {
       stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
-        senderId: 4,          // 🔥 임시 senderId
-        senderName: "somin", // 🔥 임시 senderName
+        senderId: Number(senderId),          // 🔥 임시 senderId
+        senderName: senderName, // 🔥 임시 senderName
         content: messageContent,
         messageType: "TEXT",
         eventType: "NONE"
@@ -95,6 +113,28 @@
     const messageElement = document.createElement('li');
     messageElement.innerHTML = `<strong>${message.senderName}:</strong> ${message.content} <br><small>${message.createdAt}</small>`;
     messages.appendChild(messageElement);
+  }
+
+  function leaveRoom() {
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
+
+    if(!senderId || !senderName || !roomId || !stompClient) {
+      alert('연결된 채팅방이 없습니다.');
+      return;
+    }
+
+    stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
+      senderId: Number(senderId),
+      senderName: senderName,
+      content: "",
+      messageType: "TEXT",
+      eventType: "LEAVE"
+    }));
+
+    stompClient.disconnect(() => {
+      console.log('퇴장: 소켓 연결 해제됨');
+    })
   }
 </script>
 

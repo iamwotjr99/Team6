@@ -7,7 +7,6 @@ public interface UserRepository {
     User save(User user);
 
     Optional<User> findByKakaoEmail(String kakaoEmail);
-    Optional<User> findByNickname(String nickname);
 
     Optional<User> findById(Long id);
 

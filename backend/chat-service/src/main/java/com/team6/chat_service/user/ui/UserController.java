@@ -8,6 +8,8 @@ import com.team6.chat_service.global.common.ResponseFactory;
 import com.team6.chat_service.user.application.UserService;
 import com.team6.chat_service.user.application.dto.DuplicateNicknameCheckResponseDto;
 import com.team6.chat_service.user.domain.User;
+import com.team6.chat_service.user.ui.dto.GetUserInfoRequestDto;
+import com.team6.chat_service.user.ui.dto.GetUserInfoResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,9 +39,24 @@ public class UserController {
         return ResponseFactory.ok("사용 가능한 닉네임", result);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<GetUserInfoResponseDto>> getUserInfo(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.id();
+        User userInfo = userService.getUserInfoById(userId);
+
+        GetUserInfoResponseDto response = new GetUserInfoResponseDto(
+                userInfo.getNicknameValue(),
+                userInfo.getKakaoEmail(),
+                userInfo.getCreatedAt()
+        );
+
+        return ResponseFactory.ok("유저 정보 조회 성공", response);
+    }
+
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteUser(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
-        User user = userService.findById(customUserDetails.id());
+        User user = userService.getUserInfoById(customUserDetails.id());
 
         kakaoClient.unlinkUserByAdminKey(user.getKakaoId());
 

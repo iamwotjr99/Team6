@@ -49,4 +49,12 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
                 .map(ChatRoomEntity::toChatRoom)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ChatRoom> findAllByOrderByLastMessageAtDesc() {
+        return jpaChatRoomRepository.findAllByOrderByLastMessageAtDesc()
+                .stream()
+                .map(ChatRoomEntity::toChatRoom)
+                .toList();
+    }
 }

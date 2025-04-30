@@ -40,12 +40,18 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public List<ChatRoom> getChatRooms(Long userId) {
+    public List<ChatRoom> getMyChatRooms(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Long> chatRoomIds = chatRoomUserRepository.findChatRoomIdsByUserId(userId);
         List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByIds(chatRoomIds);
+
+        return chatRoomList;
+    }
+
+    public List<ChatRoom> getChatRooms() {
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByOrderByLastMessageAtDesc();
 
         return chatRoomList;
     }
@@ -64,5 +70,17 @@ public class ChatRoomService {
         }
 
         return alreadyEntered;
+    }
+
+    @Transactional
+    public boolean leaveChatRoom(Long userId, Long roomId) {
+        boolean alreadyEntered = chatRoomUserRepository.existsByUserIdAndRoomId(userId, roomId);
+
+        if (alreadyEntered) {
+            int deleteCount = chatRoomUserRepository.deleteByUserIdAndRoomId(userId, roomId);
+            return deleteCount > 0;
+        } else {
+            return false;
+        }
     }
 }

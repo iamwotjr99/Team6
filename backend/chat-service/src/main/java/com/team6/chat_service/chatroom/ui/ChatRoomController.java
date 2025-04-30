@@ -41,11 +41,22 @@ public class ChatRoomController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getChatRooms(
+    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getMyChatRooms(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         Long userId = customUserDetails.id();
-        List<ChatRoom> chatRooms = chatRoomService.getChatRooms(userId);
+        List<ChatRoom> chatRooms = chatRoomService.getMyChatRooms(userId);
+
+        List<GetChatRoomsResponseDto> response = chatRooms.stream()
+                .map(GetChatRoomsResponseDto::from)
+                .toList();
+
+        return ResponseFactory.ok("나의 채팅방 조회 성공", response);
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getChatRooms() {
+        List<ChatRoom> chatRooms = chatRoomService.getChatRooms();
 
         List<GetChatRoomsResponseDto> response = chatRooms.stream()
                 .map(GetChatRoomsResponseDto::from)
