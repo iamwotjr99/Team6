@@ -23,6 +23,7 @@ public enum ErrorCode {
     CHATROOM_TITLE_TOO_LONG(400, "채팅방 제목은 20자 이하여야 합니다."),
     NO_CREATE_ANY_CHATROOM(409, "생성한 채팅방이 존재하지 않습니다."),
     CHATROOM_NOT_FOUND(404, "존재하지 않는 채팅방입니다."),
+    CHATROOM_USER_NOT_FOUND(404, "존재하지 않는 채팅방 접속입니다."),
 
     // 채팅 관련
     CHAT_MESSAGE_TYPE_NOT_FOUND(404, "존재하지 않는 메세지 타입입니다."),

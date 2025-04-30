@@ -10,6 +10,7 @@ import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,5 +39,9 @@ public class ChatMessageService {
 
     public List<ChatMessage> getChatMessageInRoom(Long roomId) {
         return chatMessageRepository.findByRoomId(roomId);
+    }
+
+    public List<ChatMessage> getChatMessageAfterJoinedAt(Long roomId, LocalDateTime joinedAt) {
+        return chatMessageRepository.findByAfterJoinedAt(roomId, joinedAt);
     }
 }

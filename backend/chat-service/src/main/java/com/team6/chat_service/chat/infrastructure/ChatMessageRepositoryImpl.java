@@ -12,6 +12,7 @@ import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,16 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
         return chatMessageEntities.stream()
                 .map(ChatMessageEntity::toChatMessage)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    public List<ChatMessage> findByAfterJoinedAt(Long roomId, LocalDateTime joinedAt) {
+        List<ChatMessageEntity> chatMessageEntities = jpaChatMessageRepository.findByAfterJoinedAt(
+                roomId, joinedAt);
+
+        return chatMessageEntities.stream()
+                .map(ChatMessageEntity::toChatMessage)
+                .toList();
     }
 }
