@@ -23,7 +23,12 @@ public class UserService {
         return new DuplicateNicknameCheckResponseDto(nickname, true);
     }
 
-    public User findById(Long userId) {
+    public User getUserInfo(String kakaoEmail) {
+        return userRepository.findByKakaoEmail(kakaoEmail)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public User getUserInfoById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 

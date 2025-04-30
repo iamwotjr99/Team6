@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,9 +42,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequestDto loginRequestDto,
             HttpServletResponse response) {
-        LoginResponse result = authService.login(loginRequestDto.nickname());
+        LoginResponse result = authService.login(loginRequestDto.kakaoEmail());
 
-        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(loginRequestDto.nickname());
+        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(loginRequestDto.kakaoEmail());
         CookieUtil.setRefreshTokenInCookie(response, refreshTokenDto.token(), refreshTokenDto.refreshTokenExpiration());
 
         return ResponseFactory.ok("로그인 성공", result);
@@ -55,7 +56,7 @@ public class AuthController {
         LoginResponse result = authService.signup(signupRequestDto.nickname(), signupRequestDto.kakaoId(),
                 signupRequestDto.kakaoEmail());
 
-        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(signupRequestDto.nickname());
+        RefreshTokenWithTTL refreshTokenDto = authService.issueRefreshToken(signupRequestDto.kakaoEmail());
         CookieUtil.setRefreshTokenInCookie(response, refreshTokenDto.token(), refreshTokenDto.refreshTokenExpiration());
 
         return ResponseFactory.created("회원가입 성공", result);
@@ -70,7 +71,7 @@ public class AuthController {
         return ResponseFactory.ok("토큰 리프레쉬 성공", tokenResponse);
     }
 
-    @PostMapping("/logout")
+    @DeleteMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUserDetails customUserDetails, HttpServletResponse response) {
         authService.logout(customUserDetails.id(), response);
 

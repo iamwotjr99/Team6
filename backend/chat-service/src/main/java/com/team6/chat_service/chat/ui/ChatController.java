@@ -32,6 +32,8 @@ public class ChatController {
 
         if (eventType == ChatEventType.ENTER) {
             handleEnter(roomId, message);
+        } else if (eventType == ChatEventType.LEAVE) {
+            handleLeave(roomId, message);
         } else {
             handleChatMessage(roomId, message);
         }
@@ -65,6 +67,29 @@ public class ChatController {
         ChatMessageResponse response = ChatMessageResponse.from(sendMessage);
 
         messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, response);
+    }
+
+    private void handleLeave(Long roomId, ChatMessageSendRequest message) {
+        boolean leave = chatRoomService.leaveChatRoom(message.senderId(), roomId);
+
+        if (leave) {
+            ChatMessage leaveMessage = ChatMessage.createChatMessage(
+                    message.senderId(),
+                    roomId,
+                    message.senderName(),
+                    message.senderName() + "님이 퇴장하셨습니다.",
+                    "TEXT",
+                    "LEAVE"
+            );
+
+            ChatMessage savedMessage = chatMessageService.createChatMessage(roomId,
+                    ChatMessageSendRequest.from(leaveMessage));
+
+            ChatMessageResponse response = ChatMessageResponse.from(savedMessage);
+
+            messagingTemplate.convertAndSend("/sub/chatroom/" + roomId, response);
+
+        }
     }
 
 }

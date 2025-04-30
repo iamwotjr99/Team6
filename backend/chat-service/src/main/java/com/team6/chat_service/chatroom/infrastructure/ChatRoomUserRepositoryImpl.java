@@ -1,7 +1,6 @@
 package com.team6.chat_service.chatroom.infrastructure;
 
 import com.team6.chat_service.chatroom.domain.ChatRoom;
-import com.team6.chat_service.chatroom.domain.ChatRoomUser;
 import com.team6.chat_service.chatroom.domain.entity.ChatRoomEntity;
 import com.team6.chat_service.chatroom.domain.entity.ChatRoomUserEntity;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomUserRepository;
@@ -13,8 +12,6 @@ import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -47,5 +44,11 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepository {
     public boolean existsByUserIdAndRoomId(Long userId, Long roomId) {
         return jpaChatRoomUserRepository.existsByUserEntity_IdAndChatRoomEntity_Id(userId, roomId);
     }
+
+    @Override
+    public int deleteByUserIdAndRoomId(Long userId, Long roomId) {
+        return jpaChatRoomUserRepository.deleteByUserEntity_IdAndChatRoomEntity_Id(userId, roomId);
+    }
+
 
 }

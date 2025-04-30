@@ -7,6 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JpaUserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByKakaoEmail(String kakaoEmail);
-    Optional<UserEntity> findByNickname(NicknameEntity nickname);
     boolean existsByNickname(NicknameEntity nickname);
 }

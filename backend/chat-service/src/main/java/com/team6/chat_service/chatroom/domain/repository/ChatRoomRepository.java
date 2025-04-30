@@ -7,7 +7,12 @@ import java.util.Optional;
 
 public interface ChatRoomRepository {
     ChatRoom save(ChatRoom chatRoom, User user);
+
     Optional<ChatRoom> findById(Long roomId);
+
     List<ChatRoom> findChatRoomsByCreatorId(Long userId);
+
     List<ChatRoom> findChatRoomsByIds(List<Long> chatRoomIds);
+
+    List<ChatRoom> findAllByOrderByLastMessageAtDesc();
 }
