@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import createSelectors from '.';
 import { generateBaseNickname } from '@/utils/NicknameGenerator';
-import { checkNickname } from '@/utils/CheckNickname';
+import { checkNickname } from '@/utils/checkNickname';
+
 
 type NicknameState = {
   nickname: string;
