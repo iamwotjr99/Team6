@@ -39,29 +39,23 @@ public class ChatRoomController {
         return ResponseFactory.ok("채팅방 생성 성공", response);
     }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getMyChatRooms(
+    @GetMapping("/joined")
+    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getJoinedChatRooms(
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
-        Long userId = customUserDetails.id();
-        List<ChatRoom> chatRooms = chatRoomService.getMyChatRooms(userId);
+        List<GetChatRoomsResponseDto> response = chatRoomService.getJoinedChatRooms(
+                customUserDetails.id());
 
-        List<GetChatRoomsResponseDto> response = chatRooms.stream()
-                .map(GetChatRoomsResponseDto::from)
-                .toList();
-
-        return ResponseFactory.ok("나의 채팅방 조회 성공", response);
+        return ResponseFactory.ok("내 채팅방 조회 성공", response);
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getChatRooms() {
-        List<ChatRoom> chatRooms = chatRoomService.getChatRooms();
+    @GetMapping("/not-joined")
+    public ResponseEntity<ApiResponse<List<GetChatRoomsResponseDto>>> getNotJoinedChatRooms(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        List<GetChatRoomsResponseDto> response = chatRoomService.getNotJoinedChatRooms(
+                customUserDetails.id());
 
-        List<GetChatRoomsResponseDto> response = chatRooms.stream()
-                .map(GetChatRoomsResponseDto::from)
-                .toList();
-
-        return ResponseFactory.ok("채팅방 조회 성공", response);
+        return ResponseFactory.ok("내가 속하지 않은 채팅방 조회 성공", response);
     }
 }

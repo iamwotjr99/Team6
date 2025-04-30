@@ -1,5 +1,6 @@
 package com.team6.chat_service.chatroom.application;
 
+import com.team6.chat_service.chat.domain.repository.ChatMessageReadRepository;
 import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.application.dto.CreateChatRoomDto;
 import com.team6.chat_service.chatroom.domain.ChatRoom;
@@ -8,6 +9,7 @@ import com.team6.chat_service.chatroom.domain.ChatRoomUser;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomRepository;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomUserRepository;
 import com.team6.chat_service.chatroom.ui.dto.CreateChatRoomRequestDto;
+import com.team6.chat_service.chatroom.ui.dto.GetChatRoomsResponseDto;
 import com.team6.chat_service.global.exception.CustomException;
 import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
@@ -24,6 +26,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
+    private final ChatMessageReadRepository chatMessageReadRepository;
 
     @Transactional
     public ChatRoom createChatRoom(CreateChatRoomRequestDto dto, Long userId) {
@@ -41,20 +44,33 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public List<ChatRoom> getMyChatRooms(Long userId) {
+    public List<GetChatRoomsResponseDto> getJoinedChatRooms(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Long> chatRoomIds = chatRoomUserRepository.findChatRoomIdsByUserId(userId);
-        List<ChatRoom> chatRoomList = chatRoomRepository.findChatRoomsByIds(chatRoomIds);
+        List<ChatRoom> joinedChatRooms = chatRoomRepository.findJoinedByUserId(user.getId());
 
-        return chatRoomList;
+        return joinedChatRooms.stream()
+                .map(chatRoom -> {
+                    int unreadCount = chatMessageReadRepository
+                            .countUnreadMessagesByRoomIdAndUserId(chatRoom.getId(), user.getId());
+                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount);
+                })
+                .toList();
     }
 
-    public List<ChatRoom> getChatRooms() {
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByOrderByLastMessageAtDesc();
+    public List<GetChatRoomsResponseDto> getNotJoinedChatRooms(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return chatRoomList;
+        List<ChatRoom> joinedChatRooms = chatRoomRepository.findNotJoinedByUserId(user.getId());
+
+        return joinedChatRooms.stream()
+                .map(chatRoom -> {
+                    int unreadCount = -1;
+                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount);
+                })
+                .toList();
     }
 
     public ChatRoomUser getChatRoomUserByUserIdAndRoomId(Long userId, Long roomId) {

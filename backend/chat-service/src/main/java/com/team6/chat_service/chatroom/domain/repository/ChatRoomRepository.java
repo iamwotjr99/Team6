@@ -15,4 +15,8 @@ public interface ChatRoomRepository {
     List<ChatRoom> findChatRoomsByIds(List<Long> chatRoomIds);
 
     List<ChatRoom> findAllByOrderByLastMessageAtDesc();
+
+    List<ChatRoom> findJoinedByUserId(Long userId);
+
+    List<ChatRoom> findNotJoinedByUserId(Long userId);
 }

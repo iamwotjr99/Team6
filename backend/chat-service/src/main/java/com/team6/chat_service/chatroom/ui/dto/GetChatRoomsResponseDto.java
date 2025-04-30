@@ -7,15 +7,17 @@ public record GetChatRoomsResponseDto(
         Long id,
         String title,
         String lastMessage,
-        LocalDateTime lastMessageAt
+        LocalDateTime lastMessageAt,
+        int unreadCount
 ) {
 
-    public static GetChatRoomsResponseDto from(ChatRoom chatRoom) {
+    public static GetChatRoomsResponseDto from(ChatRoom chatRoom, int unreadCount) {
         return new GetChatRoomsResponseDto(
                 chatRoom.getId(),
                 chatRoom.getTitle().getValue(),
                 chatRoom.getLastMessage(),
-                chatRoom.getLastMessageAt()
+                chatRoom.getLastMessageAt(),
+                unreadCount
         );
     }
 }

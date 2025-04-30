@@ -28,6 +28,7 @@ public enum ErrorCode {
     // 채팅 관련
     CHAT_MESSAGE_TYPE_NOT_FOUND(404, "존재하지 않는 메세지 타입입니다."),
     CHAT_EVENT_TYPE_NOT_FOUND(404, "존재하지 않는 이벤트 타입입니다."),
+    CHAT_MESSAGE_NOT_FOUND(404, "존재하지 않는 메세지입니다."),
 
     // 서버, 기타
     BAD_REQUEST(400, "잘못된 요청입니다."),

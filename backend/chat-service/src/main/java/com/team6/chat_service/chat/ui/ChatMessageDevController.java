@@ -29,7 +29,7 @@ public class ChatMessageDevController {
             @RequestParam Long userId
     ) {
         ChatRoomUser chatRoomUser = chatRoomService.getChatRoomUserByUserIdAndRoomId(userId, roomId);
-        List<ChatMessage> response = chatMessageService.getChatMessageAfterJoinedAt(roomId, chatRoomUser.getJoinedAt());
+        List<ChatMessage> response = chatMessageService.getChatMessageAfterJoinedAt(roomId, userId, chatRoomUser.getJoinedAt());
         return ResponseFactory.ok("채팅 내역 조회 성공", response);
     }
 }

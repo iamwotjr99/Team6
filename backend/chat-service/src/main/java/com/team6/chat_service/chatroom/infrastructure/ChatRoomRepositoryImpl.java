@@ -57,4 +57,20 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
                 .map(ChatRoomEntity::toChatRoom)
                 .toList();
     }
+
+    @Override
+    public List<ChatRoom> findJoinedByUserId(Long userId) {
+        return jpaChatRoomRepository.findJoinedByUserId(userId)
+                .stream()
+                .map(ChatRoomEntity::toChatRoom)
+                .toList();
+    }
+
+    @Override
+    public List<ChatRoom> findNotJoinedByUserId(Long userId) {
+        return jpaChatRoomRepository.findNotJoinedByUserId(userId)
+                .stream()
+                .map(ChatRoomEntity::toChatRoom)
+                .toList();
+    }
 }
