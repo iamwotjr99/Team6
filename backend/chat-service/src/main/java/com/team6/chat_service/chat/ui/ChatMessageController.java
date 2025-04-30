@@ -42,19 +42,8 @@ public class ChatMessageController {
                 customUserDetails.id(), roomId);
 
         List<ChatMessage> response = chatMessageService.getChatMessageAfterJoinedAt(
-                roomId, chatRoomUser.getJoinedAt());
+                roomId, customUserDetails.id(), chatRoomUser.getJoinedAt());
 
-        return ResponseFactory.ok("채팅 내역 조회 성공", response);
-    }
-
-    // 테스트 전용 API
-    @GetMapping("/dev/chatroom/{roomId}/messages")
-    public ResponseEntity<ApiResponse<List<ChatMessage>>> getTestChatMessages(
-            @PathVariable Long roomId,
-            @RequestParam Long userId
-    ) {
-        ChatRoomUser chatRoomUser = chatRoomService.getChatRoomUserByUserIdAndRoomId(userId, roomId);
-        List<ChatMessage> response = chatMessageService.getChatMessageAfterJoinedAt(roomId, chatRoomUser.getJoinedAt());
         return ResponseFactory.ok("채팅 내역 조회 성공", response);
     }
 }
