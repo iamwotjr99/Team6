@@ -4,6 +4,7 @@ import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.application.dto.CreateChatRoomDto;
 import com.team6.chat_service.chatroom.domain.ChatRoom;
 import com.team6.chat_service.chatroom.domain.ChatRoomTitle;
+import com.team6.chat_service.chatroom.domain.ChatRoomUser;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomRepository;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomUserRepository;
 import com.team6.chat_service.chatroom.ui.dto.CreateChatRoomRequestDto;
@@ -54,6 +55,11 @@ public class ChatRoomService {
         List<ChatRoom> chatRoomList = chatRoomRepository.findAllByOrderByLastMessageAtDesc();
 
         return chatRoomList;
+    }
+
+    public ChatRoomUser getChatRoomUserByUserIdAndRoomId(Long userId, Long roomId) {
+        return chatRoomUserRepository.findChatRoomUserByUserIdAndRoomId(userId, roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_USER_NOT_FOUND));
     }
 
     @Transactional

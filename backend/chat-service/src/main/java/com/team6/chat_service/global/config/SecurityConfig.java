@@ -67,7 +67,8 @@ public class SecurityConfig {
                                 "/api/users/nickname/check",
                                 "/api/auth/oauth/**",
                                 "/api/chatmessage/**",
-                                "/ws-stomp/**" // websocket 테스트
+                                "/ws-stomp/**", // websocket 테스트
+                                "/api/dev/**" // 비인가 api 테스트
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
