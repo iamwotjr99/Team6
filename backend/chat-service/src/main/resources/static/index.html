@@ -28,6 +28,13 @@
   <button onclick="sendMessage()">전송</button>
 </div>
 
+<!-- 이미지 업로드 -->
+<div style="margin-top: 10px;">
+  <input type="file" id="imageInput" accept="image/*" />
+  <button onclick="sendImage()">이미지 전송</button>
+</div>
+
+
 <!-- 나가기 -->
 <div style="margin-top: 10px;">
   <button onclick="disconnect()">연결 해제</button>
@@ -40,6 +47,7 @@
   let stompClient = null;
   let connectedRoomId = null;
   let messageMap = {}; // 메시지 ID -> DOM element 매핑
+  let messageList = [];
 
   function connect() {
     const senderId = document.getElementById('senderIdInput').value;
@@ -59,7 +67,7 @@
 
     connectedRoomId = roomId;
 
-    const socket = new SockJS(`http://localhost:8080/ws-stomp?userId=${senderId}&roomId=${roomId}`);
+    const socket = new SockJS(`http://3.38.153.246:8080/ws-stomp?userId=${senderId}&roomId=${roomId}`);
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function () {
@@ -68,7 +76,8 @@
       // 1. 일반 채팅 메시지 수신
       stompClient.subscribe(`/sub/chatroom/${roomId}`, function (message) {
         const msg = JSON.parse(message.body);
-        showMessage(msg);
+        messageList.push(msg);
+        renderMessages();
       });
 
       // 2. 읽음 상태 업데이트 수신
@@ -93,36 +102,56 @@
       // 4. 유저 전용 unread summary 구독
       stompClient.subscribe(`/sub/user/${senderId}/unread-summary`, function (message) {
         const payload = JSON.parse(message.body);
-        alert(`📨 [채팅방 ${payload.roomId}] 안읽은 메시지: ${payload.unreadCount}`);
+        alert(`[채팅방 ${payload.roomId}] 안읽은 메시지: ${payload.unreadCount}`);
       });
 
       // 5. 기존 메시지 불러오기
-      fetch(`http://localhost:8080/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
+      fetch(`http://3.38.153.246:8080/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
       .then(res => res.json())
       .then(data => {
-        document.getElementById('messages').innerHTML = '';
-        data.data.forEach(showMessage);
+        messageList.length = 0;
+        messageList.push(...data.data);
+        renderMessages();
       })
       .catch(err => console.error('기존 메시지 조회 실패', err));
     });
   }
 
-  function sendMessage() {
-    const senderId = document.getElementById('senderIdInput').value;
-    const senderName = document.getElementById('senderNameInput').value;
-    const message = document.getElementById('messageInput').value;
+  function renderMessages() {
+    const ul = document.getElementById('messages');
+    ul.innerHTML = '';
+    messageList.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    messageList.forEach(showMessage);
+  }
 
-    if (!stompClient || !connectedRoomId || !message) return;
+  function showMessage(message) {
+    const ul = document.getElementById('messages');
+    const li = document.createElement('li');
+    li.id = `msg-${message.id}`;
+    li.innerHTML = `<strong>${message.senderName}:</strong> `;
 
-    stompClient.send(`/pub/chatroom/${connectedRoomId}`, {}, JSON.stringify({
-      senderId: Number(senderId),
-      senderName: senderName,
-      content: message,
-      messageType: 'TEXT',
-      eventType: 'NONE'
-    }));
+    if (message.messageType === 'PICTURE') {
+      li.innerHTML += `<span>[이미지 로딩 중...]</span>`;
+      fetch(`http://3.38.153.246:8080/api/dev/s3/presigned-get-url?key=${message.content}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("dadadada:", data)
+          const img = new Image();
+          img.src = data.url;
+          img.style.maxWidth = '300px';
+          img.onload = () => {
+            li.innerHTML = `<strong>${message.senderName}</strong><br>`;
+            li.appendChild(img);
+            li.innerHTML += `<br><span class="unread-count">(${message.unreadCount ?? 0}명 안읽음)</span>`;
+            li.innerHTML += `<br><small>${message.createdAt}</small>`
+          };
+        });
+    } else {
+      li.innerHTML += `${message.content}<br><span class="unread-count">(${message.unreadCount ?? 0}명 안읽음)</span><br><small>${message.createdAt}</small>`;
+    }
 
-    document.getElementById('messageInput').value = '';
+    ul.appendChild(li);
+    messageMap[String(message.id)] = li;
   }
 
   function leaveRoom() {
@@ -152,16 +181,22 @@
     }
   }
 
-  function showMessage(message) {
-    const ul = document.getElementById('messages');
-    const li = document.createElement('li');
-    li.id = `msg-${message.id}`; // 메시지 ID 기반
-    li.innerHTML = `<strong>${message.senderName}:</strong> ${message.content}
-      <span class="unread-count">(${message.unreadCount ?? 0}명 안읽음)</span><br>
-      <small>${message.createdAt}</small>`;
-    ul.appendChild(li);
+  function sendMessage() {
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
+    const message = document.getElementById('messageInput').value;
 
-    messageMap[String(message.id)] = li; // 나중에 업데이트 위해 저장
+    if (!stompClient || !connectedRoomId || !message) return;
+
+    stompClient.send(`/pub/chatroom/${connectedRoomId}`, {}, JSON.stringify({
+      senderId: Number(senderId),
+      senderName,
+      content: message,
+      messageType: 'TEXT',
+      eventType: 'NONE'
+    }));
+
+    document.getElementById('messageInput').value = '';
   }
 
   function updateUnreadCount(update) {
@@ -169,14 +204,47 @@
     const unreadCount = update.unreadCount;
 
     const li = messageMap[messageId];
-    console.log("🔥 update messageId:", messageId);
-    console.log("📌 messageMap keys:", Object.keys(messageMap));
+    // console.log("🔥 update messageId:", messageId);
+    // console.log("📌 messageMap keys:", Object.keys(messageMap));
     if (li) {
       const span = li.querySelector('.unread-count');
       if (span) {
         span.textContent = `(${unreadCount}명 안읽음)`;
       }
     }
+  }
+
+  async function sendImage() {
+    const fileInput = document.getElementById('imageInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
+
+    // 1. Presigned PUT URL 요청
+    const presignedRes = await fetch(`http://3.38.153.246:8080/api/dev/s3/presigned-url?fileName=${file.name}&contentType=${file.type}&userId=${senderId}`);
+    const { url: putUrl, key } = await presignedRes.json();
+
+    // 2. PUT URL로 이미지 업로드
+    await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type
+      },
+      body: file
+    });
+
+    // 3. 소켓 메시지 전송 (key만 content에)
+    stompClient.send(`/pub/chatroom/${connectedRoomId}`, {}, JSON.stringify({
+      senderId: Number(senderId),
+      senderName: senderName,
+      content: key,
+      messageType: 'PICTURE',
+      eventType: 'NONE'
+    }));
+
+    fileInput.value = ''; // 초기화
   }
 </script>
 
