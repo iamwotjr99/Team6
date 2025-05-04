@@ -58,6 +58,11 @@ public class ChatRoomEntity {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void updateFromDomain(ChatRoom chatRoom) {
+        this.lastMessage = chatRoom.getLastMessage();
+        this.lastMessageAt = chatRoom.getLastMessageAt();
+    }
+
     public ChatRoom toChatRoom() {
         return ChatRoom.builder()
                 .id(id)

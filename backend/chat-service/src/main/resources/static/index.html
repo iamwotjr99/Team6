@@ -8,136 +8,178 @@
 </head>
 <body>
 
-<h1>채팅방 테스트</h1>
+<h2>채팅방 테스트</h2>
 
-<!-- 유저 입력창 -->
+<!-- 유저 정보 입력 -->
 <div>
   <input type="text" id="senderIdInput" placeholder="유저 ID 입력" />
   <input type="text" id="senderNameInput" placeholder="유저 이름 입력" />
 </div>
 
-
-<!-- 채팅방 번호 입력창 -->
-<div style="margin-top: 20px;">
-  <input type="text" id="roomIdInput" placeholder="채팅방 번호를 입력하세요" />
+<!-- 채팅방 번호 입력 -->
+<div style="margin-top: 10px;">
+  <input type="text" id="roomIdInput" placeholder="채팅방 ID 입력" />
   <button onclick="connect()">입장하기</button>
 </div>
 
-<!-- 메시지 입력창 -->
-<div style="margin-top: 20px;">
+<!-- 메시지 입력 -->
+<div style="margin-top: 10px;">
   <input type="text" id="messageInput" placeholder="메시지를 입력하세요" />
   <button onclick="sendMessage()">전송</button>
 </div>
 
-<!-- 퇴장 버튼 -->
-<div style="margin-top: 20px;">
-  <button onclick="leaveRoom()">퇴장하기</button>
+<!-- 나가기 -->
+<div style="margin-top: 10px;">
+  <button onclick="disconnect()">연결 해제</button>
+  <button onclick="leaveRoom()">채팅방 퇴장 (LEAVE)</button>
 </div>
 
 <ul id="messages" style="margin-top: 20px;"></ul>
 
 <script>
   let stompClient = null;
-  let roomId = null;
+  let connectedRoomId = null;
+  let messageMap = {}; // 메시지 ID -> DOM element 매핑
 
   function connect() {
     const senderId = document.getElementById('senderIdInput').value;
     const senderName = document.getElementById('senderNameInput').value;
-    roomId = document.getElementById('roomIdInput').value;
+    const roomId = document.getElementById('roomIdInput').value;
 
-    if (!roomId || !senderId || !senderName) {
-      alert('유저 ID, 유저 이름, 채팅방 번호를 모두 입력하세요.');
+    if (stompClient) {
+      stompClient.disconnect(() => {
+        console.log('기존 연결 해제됨');
+      });
+    }
+
+    if (!senderId || !senderName || !roomId) {
+      alert('모든 필드를 입력해주세요.');
       return;
     }
 
-    if (stompClient !== null) {
-      stompClient.disconnect(() => {
-        console.log('기존 소켓 연결 끊음');
-      });
-    }
+    connectedRoomId = roomId;
 
-    const socket = new SockJS('http://localhost:8080/ws-stomp');
+    const socket = new SockJS(`http://localhost:8080/ws-stomp?userId=${senderId}&roomId=${roomId}`);
     stompClient = Stomp.over(socket);
 
-    stompClient.connect({}, function (frame) {
-      document.getElementById('messages').innerHTML = '';
+    stompClient.connect({}, function () {
+      console.log('STOMP 연결 성공');
 
-      console.log('연결 성공:', frame);
-
-      // 채팅방 구독
+      // 1. 일반 채팅 메시지 수신
       stompClient.subscribe(`/sub/chatroom/${roomId}`, function (message) {
         const msg = JSON.parse(message.body);
-        console.log('받은 메시지:', msg);
         showMessage(msg);
       });
 
-      // 채팅방 입장(ENTER) 메시지 보내기
-      stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
-        senderId: Number(senderId),          // 🔥 임시 senderId
-        senderName: senderName, // 🔥 임시 senderName
-        content: "",
-        messageType: "TEXT",
-        eventType: "ENTER"
+      // 2. 읽음 상태 업데이트 수신
+      stompClient.subscribe(`/sub/chatroom/${roomId}/read-update`, function (message) {
+        const updates = JSON.parse(message.body);
+        if (Array.isArray(updates)) {
+          updates.forEach(updateUnreadCount);
+        } else {
+          updateUnreadCount(updates);
+        }
+      });
+
+      // 3. ENTER 메시지 전송
+      stompClient.send(`/pub/chatroom/${roomId}/enter`, {}, JSON.stringify({
+        senderId: Number(senderId),
+        senderName: senderName,
+        content: '',
+        messageType: 'TEXT',
+        eventType: 'ENTER'
       }));
 
-      fetch(`http://localhost:8080/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
-      .then(response => response.json())
-      .then(data => {
-        const chatList = data.data;
-        document.getElementById('messages').innerHTML = ''; // 기존 메시지 초기화
-        chatList.forEach(showMessage);
-      })
-      .catch(error => console.error('메시지 불러오기 실패:', error));
+      // 4. 유저 전용 unread summary 구독
+      stompClient.subscribe(`/sub/user/${senderId}/unread-summary`, function (message) {
+        const payload = JSON.parse(message.body);
+        alert(`📨 [채팅방 ${payload.roomId}] 안읽은 메시지: ${payload.unreadCount}`);
+      });
 
+      // 5. 기존 메시지 불러오기
+      fetch(`http://localhost:8080/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('messages').innerHTML = '';
+        data.data.forEach(showMessage);
+      })
+      .catch(err => console.error('기존 메시지 조회 실패', err));
     });
   }
 
   function sendMessage() {
-    const messageContent = document.getElementById('messageInput').value;
     const senderId = document.getElementById('senderIdInput').value;
     const senderName = document.getElementById('senderNameInput').value;
+    const message = document.getElementById('messageInput').value;
 
-    if (messageContent && stompClient && roomId) {
-      stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
-        senderId: Number(senderId),          // 🔥 임시 senderId
-        senderName: senderName, // 🔥 임시 senderName
-        content: messageContent,
-        messageType: "TEXT",
-        eventType: "NONE"
-      }));
-      document.getElementById('messageInput').value = '';
-    }
-  }
+    if (!stompClient || !connectedRoomId || !message) return;
 
-  function showMessage(message) {
-    const messages = document.getElementById('messages');
-    const messageElement = document.createElement('li');
-    messageElement.innerHTML = `<strong>${message.senderName}:</strong> ${message.content} <br><small>${message.createdAt}</small>`;
-    messages.appendChild(messageElement);
+    stompClient.send(`/pub/chatroom/${connectedRoomId}`, {}, JSON.stringify({
+      senderId: Number(senderId),
+      senderName: senderName,
+      content: message,
+      messageType: 'TEXT',
+      eventType: 'NONE'
+    }));
+
+    document.getElementById('messageInput').value = '';
   }
 
   function leaveRoom() {
     const senderId = document.getElementById('senderIdInput').value;
     const senderName = document.getElementById('senderNameInput').value;
 
-    if(!senderId || !senderName || !roomId || !stompClient) {
-      alert('연결된 채팅방이 없습니다.');
-      return;
-    }
+    if (!stompClient || !connectedRoomId) return;
 
-    stompClient.send(`/pub/chatroom/${roomId}`, {}, JSON.stringify({
+    stompClient.send(`/pub/chatroom/${connectedRoomId}/leave`, {}, JSON.stringify({
       senderId: Number(senderId),
       senderName: senderName,
-      content: "",
-      messageType: "TEXT",
-      eventType: "LEAVE"
+      content: '',
+      messageType: 'TEXT',
+      eventType: 'LEAVE'
     }));
 
     stompClient.disconnect(() => {
-      console.log('퇴장: 소켓 연결 해제됨');
-    })
+      console.log('퇴장 및 연결 해제됨');
+    });
+  }
+
+  function disconnect() {
+    if (stompClient) {
+      stompClient.disconnect(() => {
+        console.log('연결 해제됨');
+      });
+    }
+  }
+
+  function showMessage(message) {
+    const ul = document.getElementById('messages');
+    const li = document.createElement('li');
+    li.id = `msg-${message.id}`; // 메시지 ID 기반
+    li.innerHTML = `<strong>${message.senderName}:</strong> ${message.content}
+      <span class="unread-count">(${message.unreadCount ?? 0}명 안읽음)</span><br>
+      <small>${message.createdAt}</small>`;
+    ul.appendChild(li);
+
+    messageMap[String(message.id)] = li; // 나중에 업데이트 위해 저장
+  }
+
+  function updateUnreadCount(update) {
+    const messageId = String(update.messageId);
+    const unreadCount = update.unreadCount;
+
+    const li = messageMap[messageId];
+    console.log("🔥 update messageId:", messageId);
+    console.log("📌 messageMap keys:", Object.keys(messageMap));
+    if (li) {
+      const span = li.querySelector('.unread-count');
+      if (span) {
+        span.textContent = `(${unreadCount}명 안읽음)`;
+      }
+    }
   }
 </script>
+
 
 </body>
 </html>

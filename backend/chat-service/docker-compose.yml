@@ -9,12 +9,16 @@ services:
       MYSQL_USER: chat_service_user
       MYSQL_PASSWORD: 1234
       MYSQL_ROOT_PASSWORD: root
+      LANG: C.UTF-8
     ports:
       - "3309:3306"
     command:
-      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      --character-set-server=utf8mb4 
+      --collation-server=utf8mb4_unicode_ci
+      --default-time-zone=Asia/Seoul
     volumes:
       - ./mysql-data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s

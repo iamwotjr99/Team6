@@ -1,11 +1,14 @@
 package com.team6.chat_service.chat.application;
 
 import com.team6.chat_service.chat.domain.ChatMessage;
-import com.team6.chat_service.chat.domain.repository.ChatMessageReadRepository;
 import com.team6.chat_service.chat.domain.repository.ChatMessageRepository;
+import com.team6.chat_service.chat.infrastructure.redis.ChatMessageReadRedisRepository;
+import com.team6.chat_service.chat.ui.dto.ChatMessageResponse;
 import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.domain.ChatRoom;
+import com.team6.chat_service.chatroom.domain.ChatRoomUser;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomRepository;
+import com.team6.chat_service.chatroom.domain.repository.ChatRoomUserRepository;
 import com.team6.chat_service.global.exception.CustomException;
 import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
@@ -13,6 +16,7 @@ import com.team6.chat_service.user.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +27,8 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatMessageReadRepository chatMessageReadRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
+    private final ChatMessageReadRedisRepository chatMessageReadRedisRepository;
 
     @Transactional
     public ChatMessage createChatMessage(Long roomId, ChatMessageSendRequest dto) {
@@ -43,13 +48,17 @@ public class ChatMessageService {
         return chatMessageRepository.findByRoomId(roomId);
     }
 
-    public List<ChatMessage> getChatMessageAfterJoinedAt(Long roomId, Long userId, LocalDateTime joinedAt) {
-        List<ChatMessage> messages = chatMessageRepository.findByAfterJoinedAt(roomId,
-                joinedAt);
+    @Transactional
+    public List<ChatMessage> getMessagesAfterJoinedAt(Long roomId, Long userId) {
+        Optional<ChatRoomUser> chatRoomUsrOpt = chatRoomUserRepository.findChatRoomUserByUserIdAndRoomId(
+                userId, roomId);
 
-        for (ChatMessage message : messages) {
-            chatMessageReadRepository.save(message.getId(), userId);
+        if (chatRoomUsrOpt.isEmpty()) {
+            return List.of();
         }
+
+        LocalDateTime joinedAt = chatRoomUsrOpt.get().getJoinedAt();
+        List<ChatMessage> messages = chatMessageRepository.findByAfterJoinedAt(roomId, joinedAt);
 
         return messages;
     }

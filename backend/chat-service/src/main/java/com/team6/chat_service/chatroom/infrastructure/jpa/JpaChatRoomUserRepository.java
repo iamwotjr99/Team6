@@ -4,6 +4,7 @@ import com.team6.chat_service.chatroom.domain.entity.ChatRoomUserEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,4 +22,8 @@ public interface JpaChatRoomUserRepository extends JpaRepository<ChatRoomUserEnt
 
     int deleteByUserEntity_IdAndChatRoomEntity_Id(Long userId, Long roomId);
 
+    int countByChatRoomEntity_Id(Long roomId);
+
+    @Query("select cu.userEntity.id from ChatRoomUserEntity cu where cu.chatRoomEntity.id = :roomId")
+    Set<Long> findUserIdsByRoomId(@Param("roomId") Long roomId);
 }
