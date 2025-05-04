@@ -1,6 +1,8 @@
 package com.team6.chat_service.chatroom.application;
 
+import com.team6.chat_service.chat.application.ChatMessageService;
 import com.team6.chat_service.chat.domain.repository.ChatMessageReadRepository;
+import com.team6.chat_service.chat.infrastructure.redis.ChatMessageReadRedisRepository;
 import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.application.dto.CreateChatRoomDto;
 import com.team6.chat_service.chatroom.domain.ChatRoom;
@@ -27,6 +29,7 @@ public class ChatRoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
     private final ChatMessageReadRepository chatMessageReadRepository;
+    private final ChatMessageService chatMessageService;
 
     @Transactional
     public ChatRoom createChatRoom(CreateChatRoomRequestDto dto, Long userId) {
@@ -73,11 +76,6 @@ public class ChatRoomService {
                 .toList();
     }
 
-    public ChatRoomUser getChatRoomUserByUserIdAndRoomId(Long userId, Long roomId) {
-        return chatRoomUserRepository.findChatRoomUserByUserIdAndRoomId(userId, roomId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_USER_NOT_FOUND));
-    }
-
     @Transactional
     public boolean enterChatRoom(Long userId, Long roomId) {
         boolean alreadyEntered = chatRoomUserRepository.existsByUserIdAndRoomId(userId, roomId);
@@ -104,5 +102,10 @@ public class ChatRoomService {
         } else {
             return false;
         }
+    }
+
+    public int getTotalUserInRoom(Long roomId) {
+        return chatRoomUserRepository.countByRoomId(roomId);
+
     }
 }

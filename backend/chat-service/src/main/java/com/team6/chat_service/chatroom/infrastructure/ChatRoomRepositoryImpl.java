@@ -8,6 +8,7 @@ import com.team6.chat_service.global.exception.CustomException;
 import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.entity.UserEntity;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,27 +36,14 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     @Override
-    public List<ChatRoom> findChatRoomsByCreatorId(Long userId) {
-        return jpaChatRoomRepository.findByCreator_Id(userId)
-                .stream()
-                .map(ChatRoomEntity::toChatRoom)
-                .collect(Collectors.toList());
-    }
+    public void updateLastMessage(Long roomId, String lastMessage, LocalDateTime lastMessageAt) {
+        ChatRoomEntity chatRoomEntity = jpaChatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
 
-    @Override
-    public List<ChatRoom> findChatRoomsByIds(List<Long> chatRoomIds) {
-        return jpaChatRoomRepository.findByIdIn(chatRoomIds)
-                .stream()
-                .map(ChatRoomEntity::toChatRoom)
-                .collect(Collectors.toList());
-    }
+        ChatRoom chatRoom = chatRoomEntity.toChatRoom();
+        chatRoom.updateLastMessage(lastMessage, lastMessageAt);
 
-    @Override
-    public List<ChatRoom> findAllByOrderByLastMessageAtDesc() {
-        return jpaChatRoomRepository.findAllByOrderByLastMessageAtDesc()
-                .stream()
-                .map(ChatRoomEntity::toChatRoom)
-                .toList();
+        chatRoomEntity.updateFromDomain(chatRoom);
     }
 
     @Override

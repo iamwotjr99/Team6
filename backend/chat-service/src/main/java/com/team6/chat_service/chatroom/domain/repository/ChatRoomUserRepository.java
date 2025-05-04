@@ -5,6 +5,7 @@ import com.team6.chat_service.chatroom.domain.ChatRoomUser;
 import com.team6.chat_service.user.domain.User;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface ChatRoomUserRepository {
     void save(ChatRoom chatRoom, User user);
@@ -16,4 +17,8 @@ public interface ChatRoomUserRepository {
     boolean existsByUserIdAndRoomId(Long userId, Long roomId);
 
     int deleteByUserIdAndRoomId(Long userId, Long roomId);
+
+    int countByRoomId(Long roomId);
+
+    Set<Long> findUserIdsByRoomId(Long roomId);
 }

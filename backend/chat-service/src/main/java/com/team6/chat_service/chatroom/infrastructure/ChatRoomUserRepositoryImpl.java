@@ -14,6 +14,7 @@ import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -56,6 +57,16 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepository {
     @Override
     public int deleteByUserIdAndRoomId(Long userId, Long roomId) {
         return jpaChatRoomUserRepository.deleteByUserEntity_IdAndChatRoomEntity_Id(userId, roomId);
+    }
+
+    @Override
+    public int countByRoomId(Long roomId) {
+        return jpaChatRoomUserRepository.countByChatRoomEntity_Id(roomId);
+    }
+
+    @Override
+    public Set<Long> findUserIdsByRoomId(Long roomId) {
+        return jpaChatRoomUserRepository.findUserIdsByRoomId(roomId);
     }
 
 
