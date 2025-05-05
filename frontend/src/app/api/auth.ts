@@ -10,8 +10,6 @@ export async function loginWithKakao(kakaoEmail: string) {
     body: JSON.stringify({ kakaoEmail }),
   });
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error('[loginWithKakao 실패]:', errorText);
     throw new Error('로그인 요청 실패');
   }
   const json = await res.json();
@@ -28,13 +26,10 @@ export async function signupUser(nickname: string, kakaoId: number, kakaoEmail: 
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error('[signupUser 실패]:', errorText);
     throw new Error('회원가입 실패');
   }
 
   const json = await res.json();
-  console.log('[signupUser 성공]:', json);
   return json.data;
 }
 
@@ -55,9 +50,10 @@ export async function refreshAccessToken() {
 
 export async function logoutUser() {
   const accessToken = useAuthStore.getState().accessToken;
+  const clearAuth = useAuthStore.getState().clearAuth;
 
   const res = await fetch('http://3.38.153.246:8080/api/auth/logout', {
-    method: 'POST',
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${accessToken}`,
@@ -66,23 +62,15 @@ export async function logoutUser() {
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error('[logoutUser 실패]:', errorText);
     throw new Error('로그아웃 실패');
   }
-
-  console.log('[logoutUser 성공]');
-
-  const clearAuth = useAuthStore.getState().clearAuth;
+  
   clearAuth();
-
   if (useAuthStore.persist?.clearStorage) {
     await useAuthStore.persist.clearStorage();
-    console.log('auth-storage 삭제 완료');
   }
-
-  window.location.href = '/'; 
 }
+
 export async function fetchMyInfo() {
   const accessToken = useAuthStore.getState().accessToken;
 
@@ -100,13 +88,9 @@ export async function fetchMyInfo() {
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error('[내 정보 가져오기 실패]:', errorText);
     throw new Error('내 정보 가져오기 실패');
   }
 
   const json = await res.json();
-  console.log('[내 정보 가져오기 성공]:', json);
-
   return json.data; 
 }

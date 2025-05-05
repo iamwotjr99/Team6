@@ -17,7 +17,7 @@ export default async function page() {
   const data = await getData(pageId);
 
   return (
-    <section className="relative flex flex-col h-full">
+    <>
       <header className='sticky top-0 z-50 flex w-full items-center justify-center border-b border-gray-300 bg-white px-4 py-[16.5px] transition-colors duration-500'>
         <Link
           className='absolute left-1 h-8 w-1/6 font-medium bg-white rounded-full flex items-center justify-center'
@@ -25,13 +25,13 @@ export default async function page() {
         >
           <IoChevronBack size={35} color='black' />
         </Link>
-        <h1 className='text-xl font-bold text-black '>
-          개인정보처리방침
-        </h1>
+        <h1 className='text-xl font-bold text-black '>개인정보처리방침</h1>
       </header>
-      <div className="flex flex-col overflow-y-auto">
-        <NotionRender recordMap={data} rootPageId={pageId} />
-      </div>
-    </section>
+      <section className='relative flex flex-col h-full'>
+        <div className='flex flex-col overflow-y-auto'>
+          <NotionRender recordMap={data} rootPageId={pageId} />
+        </div>
+      </section>
+    </>
   );
 }
