@@ -1,9 +1,10 @@
 'use client';
 import Button from '@/components/common/Button';
+import { ReactNode } from 'react';
 
 type Props = {
   mainText: string;
-  buttonText: string;
+  buttonText?: ReactNode;
   onClick?: () => void;
 };
 

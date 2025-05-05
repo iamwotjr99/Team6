@@ -17,7 +17,6 @@ export default function SignupCheckModal() {
 
   const handleClose = () => {
     setModal(null);
-    router.push('/signup');
   };
 
   const handleSignupAndOpenMain = async () => {

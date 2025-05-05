@@ -8,7 +8,6 @@ export default function ChatCreateModal() {
 
   const handleClose = () => {
     setModal(null);
-    router.push('/chat');
   }
 
   const handleNewChat = () => {

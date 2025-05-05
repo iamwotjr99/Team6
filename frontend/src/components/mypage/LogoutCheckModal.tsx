@@ -4,7 +4,7 @@ import Button from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { useModalStore } from '@/stores/Modal';
 import { useAuthStore } from '@/stores/Auth';
-//import { logoutUser } from '@/app/api/auth';
+import { logoutUser } from '@/app/api/auth';
 
 export default function LogoutCheckModal() {
   const router = useRouter();
@@ -14,21 +14,11 @@ export default function LogoutCheckModal() {
 
   const handleClose = () => {
     setModal(null);
-    router.push('/mypage');
   };
 
   const logout = async () => {
     try {
-      if (!accessToken) {
-        console.log('[Logout] accessToken 없음. 로컬 초기화만 진행합니다.');
-        clearAuth();
-        setModal(null);
-        router.push('/');
-        return;
-      }
-
-      // await logoutUser();
-      clearAuth();
+      await logoutUser(); 
       setModal(null);
       router.push('/');
     } catch (error) {

@@ -6,7 +6,7 @@ import BackHeader from '@/components/layout/header/BackHeader';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useModalStore } from '@/stores/Modal';
-import { useRoomStore } from '@/stores/Room'; // ✅ 추가
+import { useRoomStore } from '@/stores/Room';
 import ChatCreateCheckModal from './ChatCreateCheckModal';
 
 export default function ChatCreate() {

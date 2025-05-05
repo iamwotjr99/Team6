@@ -8,6 +8,8 @@ import {
   IoChatbubbleOutline,
   IoHeart,
   IoHeartOutline,
+  IoSearch,
+  IoSearchOutline,
 } from 'react-icons/io5';
 import PlusIcon from '@/components/icon/PlusIcon';
 import {useModalStore} from '@/stores/Modal';
@@ -21,9 +23,13 @@ const LEFT_MENUS = [
     onIcon: <IoChatbubble size={ICON_SIZE} className='text-green-700'/>,
     offIcon: <IoChatbubbleOutline size={ICON_SIZE}/>
   },
-];
-
-const RIGHT_MENUS = [
+  {
+    title: 'Search',
+    value: 'search',
+    path: '/search',
+    onIcon: <IoSearch size={ICON_SIZE} className='text-green-700'/>,
+    offIcon: <IoSearchOutline  size={ICON_SIZE}/>
+  },
   {
     title: 'My',
     value: 'mypage',
@@ -55,9 +61,6 @@ export default function Navbar() {
           <PlusIcon size='lg'/>
         </CircleButton>
       </div>
-      {RIGHT_MENUS.map((menu) => (
-        <NavBarMenu key={menu.value} menu={menu} />
-      ))}
     </nav>
   );
 }

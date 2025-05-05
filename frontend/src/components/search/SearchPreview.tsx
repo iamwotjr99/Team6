@@ -1,4 +1,8 @@
-import Link from 'next/link';
+'use client';
+
+import { useModalStore } from '@/stores/Modal';
+import JoinModal from '../chat/JoinModal';
+
 
 type Props = {
   id: string;
@@ -8,16 +12,24 @@ type Props = {
   unreadCount?: number;
 };
 
-export default function ChatPreview({
+export default function SearchPreview({
   id,
   title,
   lastMessage,
   lastMessageAt,
   unreadCount,
 }: Props) {
+  const setModal = useModalStore.use.setModal();
+  const setSelectedChat = useModalStore.use.setSelectedChat();
+
+  const handleClick = () => {
+    setSelectedChat({ id, title });
+    setModal(<JoinModal />);
+  };
+
   return (
-    <Link
-      href={`/chat/${id}?title=${encodeURIComponent(title)}`}
+    <div
+      onClick={handleClick}
       className='block cursor-pointer px-4 py-2.5 border-b border-gray-200'
     >
       <div className='flex justify-between items-center mb-1'>
@@ -32,6 +44,6 @@ export default function ChatPreview({
           </span>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

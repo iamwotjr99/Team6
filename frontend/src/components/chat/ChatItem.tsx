@@ -25,27 +25,40 @@ export default function ChatItem() {
     router.push('/chat');
   };
 
-  // title이 아직 준비되지 않았다면 스켈레톤 UI 보여주기
   if (title === null) return <ChatItemSkeleton />;
 
   const messages = [
-    { type: 'me', text: '안녕?', time: '10:01', date: '2025-04-15' },
-    { type: 'you', nickname: '아이유', text: '안녕하세요!', time: '10:02', date: '2025-04-15' },
-    { type: 'me', text: '그래', time: '10:05', date: '2025-04-16' },
-    { type: 'you', nickname: '박보검', text: '넵', time: '18:09', date: '2025-04-18' },
+    { type: 'me', text: '안녕?', createdAt: '2025-04-15T10:01:00Z' },
+    {
+      type: 'you',
+      nickname: '아이유',
+      text: '안녕하세요!',
+      createdAt: '2025-04-15T10:02:00Z',
+    },
+    { type: 'me', text: '그래', createdAt: '2025-04-16T10:05:00Z' },
+    {
+      type: 'you',
+      nickname: '박보검',
+      text: '넵',
+      createdAt: '2025-04-18T18:09:00Z',
+    },
   ];
 
   let lastDate = '';
 
   return (
-    <section className="h-full overflow-y-auto">
+    <section className='h-full overflow-y-auto'>
       <BackHeader mainText={title} onClick={handleBack} />
-      <div className="px-1 py-1">
+      <div className='px-1 py-1'>
         {messages.map((msg, idx) => {
-          const isNewDate = msg.date !== lastDate;
-          lastDate = msg.date;
+          const dateObj = new Date(msg.createdAt);
+          const date = dateObj.toISOString().split('T')[0];
+          const time = dateObj.toTimeString().slice(0, 5);
 
-          const dateLabel = new Date(msg.date).toLocaleDateString('ko-KR', {
+          const isNewDate = date !== lastDate;
+          lastDate = date;
+
+          const dateLabel = dateObj.toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -55,9 +68,13 @@ export default function ChatItem() {
             <div key={idx}>
               {isNewDate && <Datebar date={dateLabel} />}
               {msg.type === 'me' ? (
-                <MeMessage message={msg.text} time={msg.time} />
+                <MeMessage message={msg.text} time={time} />
               ) : (
-                <YouMessage nickname={msg.nickname!} message={msg.text} time={msg.time} />
+                <YouMessage
+                  nickname={msg.nickname!}
+                  message={msg.text}
+                  time={time}
+                />
               )}
             </div>
           );

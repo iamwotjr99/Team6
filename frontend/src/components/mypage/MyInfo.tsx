@@ -14,7 +14,7 @@ export default function MyInfo() {
       if (!kakaoEmailInStore) return;
 
       try {
-        const data = await fetchMyInfo(kakaoEmailInStore);
+        const data = await fetchMyInfo();
         setNickname(data.nickname);
         setKakaoEmail(data.kakaoEmail);
 
