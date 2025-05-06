@@ -20,5 +20,7 @@ public interface ChatRoomUserRepository {
 
     int countByRoomId(Long roomId);
 
+    int countByUserId(Long userId);
+
     Set<Long> findUserIdsByRoomId(Long roomId);
 }

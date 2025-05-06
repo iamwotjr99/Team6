@@ -13,4 +13,6 @@ public interface ChatMessageRepository {
 
     List<ChatMessage> findByAfterJoinedAt(Long roomId, LocalDateTime joinedAt);
 
+    int countBySenderId(Long userId);
+
 }
