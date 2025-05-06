@@ -29,7 +29,6 @@ public class ChatRoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
     private final ChatMessageReadRepository chatMessageReadRepository;
-    private final ChatMessageService chatMessageService;
 
     @Transactional
     public ChatRoom createChatRoom(CreateChatRoomRequestDto dto, Long userId) {
@@ -57,7 +56,8 @@ public class ChatRoomService {
                 .map(chatRoom -> {
                     int unreadCount = chatMessageReadRepository
                             .countUnreadMessagesByRoomIdAndUserId(chatRoom.getId(), user.getId());
-                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount);
+                    int totalUserCount = chatRoomUserRepository.countByRoomId(chatRoom.getId());
+                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount, totalUserCount);
                 })
                 .toList();
     }
@@ -71,7 +71,8 @@ public class ChatRoomService {
         return joinedChatRooms.stream()
                 .map(chatRoom -> {
                     int unreadCount = -1;
-                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount);
+                    int totalUserCount = chatRoomUserRepository.countByRoomId(chatRoom.getId());
+                    return GetChatRoomsResponseDto.from(chatRoom, unreadCount, totalUserCount);
                 })
                 .toList();
     }

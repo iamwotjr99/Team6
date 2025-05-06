@@ -137,7 +137,7 @@
         .then(data => {
           console.log("dadadada:", data)
           const img = new Image();
-          img.src = data.url;
+          img.src = data.data.url;
           img.style.maxWidth = '300px';
           img.onload = () => {
             li.innerHTML = `<strong>${message.senderName}</strong><br>`;
