@@ -11,9 +11,9 @@ public interface ChatRoomRepository {
 
     Optional<ChatRoom> findById(Long roomId);
 
+    void updateLastMessage(Long roomId, String lastMessage, LocalDateTime lastMessageAt);
+
     List<ChatRoom> findJoinedByUserId(Long userId);
 
     List<ChatRoom> findNotJoinedByUserId(Long userId);
-
-    int countByCreatedUserId(Long userId);
 }
