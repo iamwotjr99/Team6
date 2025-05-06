@@ -1,5 +1,7 @@
 package com.team6.chat_service.user.application;
 
+import com.team6.chat_service.chat.domain.repository.ChatMessageRepository;
+import com.team6.chat_service.chatroom.domain.repository.ChatRoomRepository;
 import com.team6.chat_service.chatroom.domain.repository.ChatRoomUserRepository;
 import com.team6.chat_service.chatroom.infrastructure.redis.ChatRoomOnlineRedisRepository;
 import com.team6.chat_service.global.exception.CustomException;
@@ -7,6 +9,7 @@ import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.application.dto.DuplicateNicknameCheckResponseDto;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.repository.UserRepository;
+import com.team6.chat_service.user.ui.dto.UserChatStatsResponse;
 import jakarta.transaction.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +22,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomOnlineRedisRepository chatRoomOnlineRedisRepository;
 
     public DuplicateNicknameCheckResponseDto checkDuplicateNickname(String nickname) {
@@ -57,6 +62,15 @@ public class UserService {
                 .collect(Collectors.toSet());
 
         return offlineUserIds;
+    }
+
+    @Transactional
+    public UserChatStatsResponse getUserStats(Long userId) {
+        int created = chatRoomRepository.countByCreatedUserId(userId);
+        int joined = chatRoomUserRepository.countByUserId(userId);
+        int sent = chatMessageRepository.countBySenderId(userId);
+
+        return UserChatStatsResponse.from(created, joined, sent);
     }
 
 }

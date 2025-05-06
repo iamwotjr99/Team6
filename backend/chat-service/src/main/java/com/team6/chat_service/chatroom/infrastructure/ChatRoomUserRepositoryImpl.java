@@ -65,6 +65,11 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepository {
     }
 
     @Override
+    public int countByUserId(Long userId) {
+        return jpaChatRoomUserRepository.countByUserEntity_Id(userId);
+    }
+
+    @Override
     public Set<Long> findUserIdsByRoomId(Long roomId) {
         return jpaChatRoomUserRepository.findUserIdsByRoomId(roomId);
     }

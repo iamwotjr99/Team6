@@ -14,7 +14,6 @@ import com.team6.chat_service.user.domain.entity.UserEntity;
 import com.team6.chat_service.user.infrastructure.jpa.JpaUserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -58,5 +57,10 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         return chatMessageEntities.stream()
                 .map(ChatMessageEntity::toChatMessage)
                 .toList();
+    }
+
+    @Override
+    public int countBySenderId(Long userId) {
+        return jpaChatMessageRepository.countByUserEntity_Id(userId);
     }
 }

@@ -10,6 +10,7 @@ import com.team6.chat_service.user.application.dto.DuplicateNicknameCheckRespons
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.ui.dto.GetUserInfoRequestDto;
 import com.team6.chat_service.user.ui.dto.GetUserInfoResponseDto;
+import com.team6.chat_service.user.ui.dto.UserChatStatsResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -65,5 +66,12 @@ public class UserController {
         authService.logout(customUserDetails.id(), response);
 
         return ResponseFactory.ok("회원 탈퇴 성공", null);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<ApiResponse<UserChatStatsResponse>> getUserStats(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        UserChatStatsResponse response = userService.getUserStats(customUserDetails.id());
+
+        return ResponseFactory.ok("유저 통계 조회 성공", response);
     }
 }

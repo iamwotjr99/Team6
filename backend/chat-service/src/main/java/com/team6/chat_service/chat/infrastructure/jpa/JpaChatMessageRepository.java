@@ -14,4 +14,6 @@ public interface JpaChatMessageRepository extends JpaRepository<ChatMessageEntit
     @Query("SELECT m FROM ChatMessageEntity m WHERE m.chatRoomEntity.id = :roomId AND m.createdAt > :joinedAt ORDER BY m.createdAt ASC")
     List<ChatMessageEntity> findByAfterJoinedAt(@Param("roomId") Long roomId,
                                                 @Param("joinedAt")LocalDateTime joinedAt);
+
+    int countByUserEntity_Id(Long userId);
 }
