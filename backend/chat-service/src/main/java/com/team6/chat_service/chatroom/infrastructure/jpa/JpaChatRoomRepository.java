@@ -1,5 +1,6 @@
 package com.team6.chat_service.chatroom.infrastructure.jpa;
 
+import com.team6.chat_service.chatroom.domain.ChatRoom;
 import com.team6.chat_service.chatroom.domain.entity.ChatRoomEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
@@ -29,7 +30,5 @@ public interface JpaChatRoomRepository extends JpaRepository<ChatRoomEntity, Lon
       )
 """)
     List<ChatRoomEntity> findNotJoinedByUserId(@Param("userId") Long userId);
-
-    int countByCreator_Id(Long userId);
 
 }
