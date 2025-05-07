@@ -139,7 +139,10 @@
     ```
 ---
 
-## 6. 채팅방 퇴장 (WebSocket)
+## 6. 채팅방 나가기(뒤로 가기) (WebSocket)
+- **전송 대상:** `/pub/chatroom/{roomId}/exit`
+
+## 7. 채팅방 퇴장 (WebSocket)
 - **전송 대상:** `/pub/chatroom/{roomId}/leave`
 - **요청 Body:**
   ```json
@@ -168,13 +171,15 @@
 
 ---
 
-## 7. 채팅방별 읽지 않은 메시지 개수 푸시 (WebSocket)
+## 7. 채팅방별 읽지 않은 메시지와 안읽은 메세지 개수 푸시 (WebSocket)
 - **서버가 오프라인 유저에게 전송하는 구독 메시지**
   - 구독 주소: `/sub/user/{userId}/unread-summary`
   - 메시지 예시:
     ```json
     {
       "roomId": 6,
+      "preview": "안녕하세요", // 또는 최근 텍스트
+      "createdAt": "2025-05-07T16:47:00",
       "unreadCount": "3"
     }
     ```
@@ -182,6 +187,8 @@
     ```json
     {
       "roomId": 6,
+      "preview": "안녕하세요", // 또는 최근 텍스트
+      "createdAt": "2025-05-07T16:47:00",
       "unreadCount": "50+"
     }
     ```
