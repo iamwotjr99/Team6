@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Unread Summary Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>📨 Unread Summary 테스트</h2>
+<input type="text" id="userIdInput" placeholder="유저 ID 입력" />
+<button onclick="connectSummary()">구독 시작</button>
+
+<ul id="logs"></ul>
+
+<script>
+  let stompClient = null;
+
+  function connectSummary() {
+    const userId = document.getElementById('userIdInput').value;
+    const socket = new SockJS(`http://localhost/ws-stomp?userId=${userId}`);
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, () => {
+      console.log('📡 STOMP 연결 완료');
+
+      stompClient.subscribe(`/sub/user/${userId}/unread-summary`, (message) => {
+        const payload = JSON.parse(message.body);
+        console.log(payload);
+        const li = document.createElement('li');
+        li.innerText = `[채팅방 ${payload.roomId}] 안읽은 메시지: ${payload.unreadCount}`;
+        document.getElementById('logs').appendChild(li);
+      });
+    });
+  }
+</script>
+</body>
+</html>

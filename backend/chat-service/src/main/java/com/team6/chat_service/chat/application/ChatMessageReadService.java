@@ -40,8 +40,6 @@ public class ChatMessageReadService {
 
     @Transactional
     public List<ChatMessageReadUpdateDto> markAsReadAndUpdate(List<ChatMessage> messages, Long roomId, Long userId) {
-        int totalUserInRoom = chatRoomService.getTotalUserInRoom(roomId);
-
         List<ChatMessageReadUpdateDto> updates = messages.stream()
                 .peek(msg -> {
                     chatMessageReadRedisRepository.markAsRead(msg.getId(), userId);
@@ -50,7 +48,7 @@ public class ChatMessageReadService {
                 .map(msg -> {
                     int readUserCount = (int) chatMessageReadRedisRepository.countReadUsers(
                             msg.getId());
-                    int unreadCount = Math.max(0, totalUserInRoom - readUserCount);
+                    int unreadCount = Math.max(0, msg.getParticipantCount() - readUserCount);
                     return ChatMessageReadUpdateDto.from(msg.getId(), unreadCount);
                 })
                 .toList();

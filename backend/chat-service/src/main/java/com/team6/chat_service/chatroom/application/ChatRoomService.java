@@ -1,7 +1,9 @@
 package com.team6.chat_service.chatroom.application;
 
 import com.team6.chat_service.chat.application.ChatMessageService;
+import com.team6.chat_service.chat.domain.ChatMessage;
 import com.team6.chat_service.chat.domain.repository.ChatMessageReadRepository;
+import com.team6.chat_service.chat.domain.repository.ChatMessageRepository;
 import com.team6.chat_service.chat.infrastructure.redis.ChatMessageReadRedisRepository;
 import com.team6.chat_service.chat.ui.dto.ChatMessageSendRequest;
 import com.team6.chat_service.chatroom.application.dto.CreateChatRoomDto;
@@ -17,6 +19,7 @@ import com.team6.chat_service.global.exception.ErrorCode;
 import com.team6.chat_service.user.domain.User;
 import com.team6.chat_service.user.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,8 @@ public class ChatRoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final UserRepository userRepository;
     private final ChatMessageReadRepository chatMessageReadRepository;
+    private final ChatMessageReadRedisRepository chatMessageReadRedisRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ChatMessageService chatMessageService;
 
     @Transactional
@@ -80,13 +85,24 @@ public class ChatRoomService {
     public boolean enterChatRoom(Long userId, Long roomId) {
         boolean alreadyEntered = chatRoomUserRepository.existsByUserIdAndRoomId(userId, roomId);
 
-        if(!alreadyEntered) {
+        if (!alreadyEntered) {
             ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             chatRoomUserRepository.save(chatRoom, user);
+        }
+
+        ChatRoomUser chatRoomUser = chatRoomUserRepository.findChatRoomUserByUserIdAndRoomId(userId, roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_USER_NOT_FOUND));
+
+        LocalDateTime joinedAt = chatRoomUser.getJoinedAt();
+
+        // 입장 시점 이전 메시지 모두 읽음 처리
+        List<ChatMessage> messages = chatMessageRepository.findByBeforeJoinedAt(roomId, joinedAt);
+        for (ChatMessage msg : messages) {
+            chatMessageReadRedisRepository.markAsRead(msg.getId(), userId);
         }
 
         return alreadyEntered;
@@ -108,4 +124,6 @@ public class ChatRoomService {
         return chatRoomUserRepository.countByRoomId(roomId);
 
     }
+
+
 }

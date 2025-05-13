@@ -61,4 +61,18 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
                 .map(ChatRoomEntity::toChatRoom)
                 .toList();
     }
+
+    @Override
+    public int countByCreatedUserId(Long userId) {
+        return jpaChatRoomRepository.countByCreator_Id(userId);
+    }
+
+    @Override
+    public void updateLastMessage(ChatRoom chatRoom) {
+        ChatRoomEntity chatRoomEntity = jpaChatRoomRepository.findById(chatRoom.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        chatRoomEntity.updateFromDomain(chatRoom);
+        jpaChatRoomRepository.save(chatRoomEntity);
+    }
 }

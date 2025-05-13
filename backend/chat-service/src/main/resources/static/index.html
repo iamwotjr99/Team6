@@ -37,7 +37,7 @@
 
 <!-- 나가기 -->
 <div style="margin-top: 10px;">
-  <button onclick="disconnect()">연결 해제</button>
+  <button onclick="exitRoom()">연결 해제</button>
   <button onclick="leaveRoom()">채팅방 퇴장 (LEAVE)</button>
 </div>
 
@@ -67,7 +67,7 @@
 
     connectedRoomId = roomId;
 
-    const socket = new SockJS(`http://3.38.153.246:8080/ws-stomp?userId=${senderId}&roomId=${roomId}`);
+    const socket = new SockJS(`http://3.38.153.246/ws-stomp?userId=${senderId}&roomId=${roomId}`);
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function () {
@@ -75,7 +75,9 @@
 
       // 1. 일반 채팅 메시지 수신
       stompClient.subscribe(`/sub/chatroom/${roomId}`, function (message) {
+        console.log("📦 수신 메시지:", message.body);
         const msg = JSON.parse(message.body);
+        console.log("✅ 파싱된 메시지:", msg);
         messageList.push(msg);
         renderMessages();
       });
@@ -102,11 +104,12 @@
       // 4. 유저 전용 unread summary 구독
       stompClient.subscribe(`/sub/user/${senderId}/unread-summary`, function (message) {
         const payload = JSON.parse(message.body);
+        console.log(payload);
         alert(`[채팅방 ${payload.roomId}] 안읽은 메시지: ${payload.unreadCount}`);
       });
 
       // 5. 기존 메시지 불러오기
-      fetch(`http://3.38.153.246:8080/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
+      fetch(`http://3.38.153.246/api/dev/chatroom/${roomId}/messages?userId=${senderId}`)
       .then(res => res.json())
       .then(data => {
         messageList.length = 0;
@@ -132,7 +135,7 @@
 
     if (message.messageType === 'PICTURE') {
       li.innerHTML += `<span>[이미지 로딩 중...]</span>`;
-      fetch(`http://3.38.153.246:8080/api/dev/s3/presigned-get-url?key=${message.content}`)
+      fetch(`http://3.38.153.246/api/dev/s3/presigned-get-url?key=${message.content}`)
         .then(res => res.json())
         .then(data => {
           console.log("dadadada:", data)
@@ -173,12 +176,25 @@
     });
   }
 
-  function disconnect() {
-    if (stompClient) {
-      stompClient.disconnect(() => {
-        console.log('연결 해제됨');
-      });
-    }
+  function exitRoom() {
+    const senderId = document.getElementById('senderIdInput').value;
+    const senderName = document.getElementById('senderNameInput').value;
+
+    if (!stompClient || !connectedRoomId) return;
+
+    stompClient.send(`/pub/chatroom/${connectedRoomId}/exit`, {}, JSON.stringify({
+      senderId: senderId,
+      senderName: senderName,
+      content: '',
+      messageType: 'TEXT',
+      eventType: 'NONE'
+    }));
+
+    stompClient.disconnect(() => {
+      console.log('연결 해제됨');
+      alert('채팅방에서 나갔습니다.');
+    });
+
   }
 
   function sendMessage() {
@@ -214,6 +230,7 @@
     }
   }
 
+
   async function sendImage() {
     const fileInput = document.getElementById('imageInput');
     const file = fileInput.files[0];
@@ -223,8 +240,9 @@
     const senderName = document.getElementById('senderNameInput').value;
 
     // 1. Presigned PUT URL 요청
-    const presignedRes = await fetch(`http://3.38.153.246:8080/api/dev/s3/presigned-url?fileName=${file.name}&contentType=${file.type}&userId=${senderId}`);
-    const { url: putUrl, key } = await presignedRes.json();
+    const presignedRes = await fetch(`http://3.38.153.246/api/dev/s3/presigned-url?fileName=${file.name}&contentType=${file.type}&userId=${senderId}`);
+    const { data: { url: putUrl, key } } = await presignedRes.json();
+    console.log(putUrl, key);
 
     // 2. PUT URL로 이미지 업로드
     await fetch(putUrl, {

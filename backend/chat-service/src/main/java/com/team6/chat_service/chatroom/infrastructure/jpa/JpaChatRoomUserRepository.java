@@ -28,4 +28,6 @@ public interface JpaChatRoomUserRepository extends JpaRepository<ChatRoomUserEnt
 
     @Query("select cu.userEntity.id from ChatRoomUserEntity cu where cu.chatRoomEntity.id = :roomId")
     Set<Long> findUserIdsByRoomId(@Param("roomId") Long roomId);
+
+    List<ChatRoomUserEntity> findByChatRoomEntity_Id(Long roomId);
 }
