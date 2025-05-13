@@ -3,13 +3,17 @@ package com.team6.chat_service.chat.infrastructure.redis;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class ChatMessageReadRedisRepository {
     private final RedisTemplate<String, String> redisTemplate;
+
+    public ChatMessageReadRedisRepository(@Qualifier("customStringRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     // key: message:read:{chatId}
     // value: userIds

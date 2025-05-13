@@ -16,4 +16,6 @@ public interface ChatRoomRepository {
     List<ChatRoom> findNotJoinedByUserId(Long userId);
 
     int countByCreatedUserId(Long userId);
+
+    void updateLastMessage(ChatRoom chatRoom);
 }

@@ -16,4 +16,8 @@ public interface JpaChatMessageRepository extends JpaRepository<ChatMessageEntit
                                                 @Param("joinedAt")LocalDateTime joinedAt);
 
     int countByUserEntity_Id(Long userId);
+
+    @Query("SELECT m FROM ChatMessageEntity m WHERE m.chatRoomEntity.id = :roomId AND m.createdAt < :joinedAt")
+    List<ChatMessageEntity> findByBeforeJoinedAt(@Param("roomId") Long roomId, @Param("joinedAt") LocalDateTime joinedAt);
+
 }

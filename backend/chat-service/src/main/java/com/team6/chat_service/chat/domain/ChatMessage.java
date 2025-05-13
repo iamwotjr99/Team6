@@ -19,15 +19,22 @@ public class ChatMessage {
     private ChatMessageType messageType;
     private ChatEventType eventType;
     private LocalDateTime createdAt;
+    private int participantCount;
+
+    public static ChatMessage createChatMessage(Long senderId, Long roomId, String senderName,
+            String content, String messageType, String eventType, int participantCount) {
+        return new ChatMessage(senderId, roomId, senderName,
+                content, ChatMessageType.from(messageType), ChatEventType.from(eventType), participantCount);
+    }
 
     public static ChatMessage createChatMessage(Long senderId, Long roomId, String senderName,
             String content, String messageType, String eventType) {
         return new ChatMessage(senderId, roomId, senderName,
-                content, ChatMessageType.from(messageType), ChatEventType.from(eventType));
+                content, ChatMessageType.from(messageType), ChatEventType.from(eventType), 0);
     }
 
     private ChatMessage(Long senderId, Long roomId, String senderName, String content,
-            ChatMessageType messageType, ChatEventType eventType) {
+            ChatMessageType messageType, ChatEventType eventType, int participantCount) {
         this.senderId = senderId;
         this.roomId = roomId;
         this.senderName = senderName;
@@ -35,5 +42,6 @@ public class ChatMessage {
         this.messageType = messageType;
         this.eventType = eventType;
         this.createdAt = LocalDateTime.now();
+        this.participantCount = participantCount;
     }
 }

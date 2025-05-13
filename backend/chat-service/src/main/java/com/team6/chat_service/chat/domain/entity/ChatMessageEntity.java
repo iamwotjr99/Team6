@@ -61,6 +61,9 @@ public class ChatMessageEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "participant_count")
+    private Integer participantCount = 0;
+
     public ChatMessageEntity(ChatMessage chatMessage, UserEntity userEntity, ChatRoomEntity chatRoomEntity) {
         this.id = chatMessage.getId();
         this.userEntity = userEntity;
@@ -70,6 +73,7 @@ public class ChatMessageEntity {
         this.messageType = chatMessage.getMessageType();
         this.eventType = chatMessage.getEventType();
         this.createdAt = chatMessage.getCreatedAt();
+        this.participantCount = chatMessage.getParticipantCount();
     }
 
     public ChatMessage toChatMessage() {
@@ -82,6 +86,7 @@ public class ChatMessageEntity {
                 .messageType(this.messageType)
                 .eventType(this.eventType)
                 .createdAt(this.createdAt)
+                .participantCount(this.participantCount)
                 .build();
     }
 }

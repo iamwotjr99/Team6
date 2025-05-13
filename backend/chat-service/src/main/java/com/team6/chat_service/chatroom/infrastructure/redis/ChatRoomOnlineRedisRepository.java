@@ -2,13 +2,21 @@ package com.team6.chat_service.chatroom.infrastructure.redis;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class ChatRoomOnlineRedisRepository {
     private final RedisTemplate<String, String> redisTemplate;
+
+    public ChatRoomOnlineRedisRepository(
+            @Qualifier("customStringRedisTemplate")
+            RedisTemplate<String, String> redisTemplate
+    ) {
+        this.redisTemplate = redisTemplate;
+    }
+
 
     // key: chatroom:online:{roomId}
     // value: userIds

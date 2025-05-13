@@ -74,5 +74,13 @@ public class ChatRoomUserRepositoryImpl implements ChatRoomUserRepository {
         return jpaChatRoomUserRepository.findUserIdsByRoomId(roomId);
     }
 
+    @Override
+    public List<ChatRoomUser> findByRoomId(Long roomId) {
+        return jpaChatRoomUserRepository.findByChatRoomEntity_Id(roomId)
+                .stream()
+                .map(ChatRoomUserEntity::toChatRoomUser)
+                .toList();
+    }
+
 
 }

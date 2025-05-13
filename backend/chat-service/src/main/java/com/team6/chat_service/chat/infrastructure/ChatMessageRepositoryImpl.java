@@ -63,4 +63,11 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     public int countBySenderId(Long userId) {
         return jpaChatMessageRepository.countByUserEntity_Id(userId);
     }
+
+    @Override
+    public List<ChatMessage> findByBeforeJoinedAt(Long roomId, LocalDateTime joindAt) {
+        return jpaChatMessageRepository.findByBeforeJoinedAt(roomId, joindAt).stream()
+                .map(ChatMessageEntity::toChatMessage)
+                .toList();
+    }
 }
