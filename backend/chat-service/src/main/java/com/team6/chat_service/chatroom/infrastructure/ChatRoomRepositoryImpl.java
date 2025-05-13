@@ -36,6 +36,17 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     @Override
+    public void updateLastMessage(Long roomId, String lastMessage, LocalDateTime lastMessageAt) {
+        ChatRoomEntity chatRoomEntity = jpaChatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        ChatRoom chatRoom = chatRoomEntity.toChatRoom();
+        chatRoom.updateLastMessage(lastMessage, lastMessageAt);
+
+        chatRoomEntity.updateFromDomain(chatRoom);
+    }
+
+    @Override
     public List<ChatRoom> findJoinedByUserId(Long userId) {
         return jpaChatRoomRepository.findJoinedByUserId(userId)
                 .stream()
